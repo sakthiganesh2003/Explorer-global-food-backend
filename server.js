@@ -22,7 +22,8 @@ app.use(
 );
 
 // API Routes
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
+//app.use("/api/user", require("./Routes/Authroutes"));
 // app.use("/api/profile", profileRoutes);
 // app.use("/api/booking", bookingRoutes);
 
