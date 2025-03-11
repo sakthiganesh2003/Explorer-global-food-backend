@@ -25,19 +25,45 @@ exports.signup = async (req, res) => {
     try {
         console.log("✅ Received Data:", req.body);
         const { name, email, password } = req.body;
-        if (!name || !email || !password) return res.status(400).json({ message: "All fields are required" });
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
 
         const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ message: "User already exists" });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = crypto.randomBytes(32).toString("hex");
 
         const newUser = new User({
-            name, email, password: hashedPassword, isVerified: false, verificationToken, role: "user"
+            name,
+            email,
+            password: hashedPassword,
+            isVerified: false,
+            verificationToken,
+            role: "user",
         });
         await newUser.save();
 
+        const verificationUrl = `${process.env.CLIENT_URL}/verify-mail/${verificationToken}`;
+
+        // Send verification email
+        try {
+            await transporter.sendMail({
+                from: `Global Cuisine Explorer <${process.env.EMAIL_USER}>`,
+                to: email,
+                subject: "Verify Your Email",
+                html: `<p>Click <a href="${verificationUrl}">here</a> to verify your email.</p>`,
+            });
+            console.log("✅ Verification email sent to:", email);
+        } catch (emailError) {
+            console.error("❌ Error sending email:", emailError);
+            return res.status(500).json({ message: "Failed to send verification email." });
+        }
+
+        // Generate JWT Token
         const token = jwt.sign(
             { id: newUser._id, email: newUser.email, role: newUser.role },
             process.env.JWT_SECRET,
@@ -46,44 +72,71 @@ exports.signup = async (req, res) => {
 
         res.status(201).json({
             message: "User registered successfully. Please verify your email.",
-            token, user: { id: newUser._id, name: newUser.name, role: newUser.role }
+            token,
+            user: { id: newUser._id, name: newUser.name, role: newUser.role },
         });
 
-        const verificationUrl = `${process.env.CLIENT_URL}/verify-mail/${verificationToken}`;
-        await transporter.sendMail({
-            from: `TravelerConnect <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "Verify Your Email",
-            html: `<p>Click <a href="${verificationUrl}">here</a> to verify your email.</p>`
-        });
     } catch (error) {
         console.error("❌ Signup Error:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
 
+
+
 exports.login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!email || !password) return res.status(400).json({ error: "Please enter a valid email and password" });
+  try {
+    const { email, password } = req.body;
 
-        const user = await User.findOne({ email });
-        if (!user || !user.isVerified) return res.status(401).json({ error: "Invalid credentials or unverified email" });
-
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
-        if (!isPasswordCorrect) return res.status(401).json({ error: "Invalid credentials" });
-
-        const token = jwt.sign(
-            { id: user._id.toString(), user: user.name, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN }
-        );
-        res.status(200).json({ message: "Login successful", user: { _id: user._id, name: user.name, role: user.role }, token });
-    } catch (error) {
-        console.error("❌ Login error:", error);
-        res.status(500).json({ error: "Internal server error" });
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res.status(400).json({ error: "Please enter a valid email and password" });
     }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    console.log(user); // Log user to check if it's found correctly
+    console.log('Input Password:', password); // Check if the input password matches what the user entered
+
+    // If user does not exist or email is not verified, send appropriate error
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    // If email is not verified, handle it if needed
+    // if (!user.isVerified) {
+    //   return res.status(401).json({ error: "Email is not verified" });
+    // }
+
+    // Check if password matches
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    // Create JWT token
+    const token = jwt.sign(
+      { id: user._id.toString(), user: user.name, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // Respond with success message and user details
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        name: user.name,
+        role: user.role
+      },
+      token
+    });
+  } catch (error) {
+    console.error("❌ Login error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
+
 
 exports.verifyEmail = async (req, res) => {
     try {
