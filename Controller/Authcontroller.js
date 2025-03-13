@@ -1,10 +1,11 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const User = require("../models/Users");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const User = require("../Models/Users");
-const ResetPassword = require("../Models/ResetPassword");
+const ResetPassword = require("../models/ResetPassword");
+const otpStorage = require("../models/ResetPassword");
 
 dotenv.config();
 
@@ -19,11 +20,9 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const verifiedResetSessions = new Map();
-
-exports.signup = async (req, res) => {
+// User Signup
+const signup = async (req, res) => {
     try {
-        console.log("✅ Received Data:", req.body);
         const { name, email, password } = req.body;
         if (!name || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
@@ -43,118 +42,63 @@ exports.signup = async (req, res) => {
             password: hashedPassword,
             isVerified: false,
             verificationToken,
-            role: "user",
         });
+
         await newUser.save();
 
-        const verificationUrl = `${process.env.CLIENT_URL}/verify-mail/${verificationToken}`;
+        const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
 
-        // Send verification email
-        try {
-            await transporter.sendMail({
-                from: `Global Cuisine Explorer <${process.env.EMAIL_USER}>`,
-                to: email,
-                subject: "Verify Your Email",
-                html: `<p>Click <a href="${verificationUrl}">here</a> to verify your email.</p>`,
-            });
-            console.log("✅ Verification email sent to:", email);
-        } catch (emailError) {
-            console.error("❌ Error sending email:", emailError);
-            return res.status(500).json({ message: "Failed to send verification email." });
-        }
-
-        // Generate JWT Token
-        const token = jwt.sign(
-            { id: newUser._id, email: newUser.email, role: newUser.role },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
-
-        res.status(201).json({
-            message: "User registered successfully. Please verify your email.",
-            token,
-            user: { id: newUser._id, name: newUser.name, role: newUser.role },
+        await transporter.sendMail({
+            from: `"Global_food_explore" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Verify Your Email",
+            html: `<p>Click <a href="${verificationUrl}">here</a> to verify your email.</p>`,
         });
 
+        res.status(201).json({ message: "User registered successfully. Please verify your email." });
     } catch (error) {
         console.error("❌ Signup Error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 
-
-
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Check if email and password are provided
-    if (!email || !password) {
-      return res.status(400).json({ error: "Please enter a valid email and password" });
-    }
-
-    // Find user by email
-    const user = await User.findOne({ email });
-    console.log(user); // Log user to check if it's found correctly
-    console.log('Input Password:', password); // Check if the input password matches what the user entered
-
-    // If user does not exist or email is not verified, send appropriate error
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    // If email is not verified, handle it if needed
-    // if (!user.isVerified) {
-    //   return res.status(401).json({ error: "Email is not verified" });
-    // }
-
-    // Check if password matches
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    // Create JWT token
-    const token = jwt.sign(
-      { id: user._id.toString(), user: user.name, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    // Respond with success message and user details
-    res.status(200).json({
-      message: "Login successful",
-      user: {
-        _id: user._id,
-        name: user.name,
-        role: user.role
-      },
-      token
-    });
-  } catch (error) {
-    console.error("❌ Login error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-
-exports.verifyEmail = async (req, res) => {
+// User Login
+const login = async (req, res) => {
     try {
-        const { token } = req.params;
-        const user = await User.findOne({ verificationToken: token });
-        if (!user) return res.status(400).json({ message: "Invalid or expired token" });
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: "Please enter a valid email and password" });
+        }
 
-        user.isVerified = true;
-        user.verificationToken = null;
-        await user.save();
-        res.status(200).json({ message: "Email verified successfully!" });
+        const user = await User.findOne({ email });
+        // if (!user || !user.isVerified) {
+        //     return res.status(403).json({ error: "Please verify your email before logging in" });
+        // }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        const token = jwt.sign(
+            { id: user._id.toString(), role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        res.status(200).json({
+            message: "Login successful",
+            user: { _id: user._id.toString(), name: user.name, role: user.role },
+            token,
+        });
     } catch (error) {
-        console.error("❌ Email Verification Error:", error);
-        res.status(500).json({ message: "Server error" });
+        console.error("❌ Login Error:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 
-exports.forgotPassword = async (req, res) => {
+// Forgot Password
+const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) return res.status(400).json({ message: "Email is required" });
@@ -166,7 +110,7 @@ exports.forgotPassword = async (req, res) => {
 
         await ResetPassword.create({ userId: user._id, email: user.email, resetPasswordCode: resetCode, resetPasswordExpires: expiryTime });
         await transporter.sendMail({ 
-            from: `TravelerConnect <${process.env.EMAIL_USER}>`, 
+            from: `Global_food_explore <${process.env.EMAIL_USER}>`, 
             to: user.email, 
             subject: "Password Reset Code", 
             text: `Your reset code: ${resetCode}` 
@@ -178,29 +122,13 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
-exports.resetPassword = async (req, res) => {
-    try {
-        const { newPassword } = req.body;
-        const validUserId = [...verifiedResetSessions.keys()].find(userId => verifiedResetSessions.get(userId) > Date.now());
-        if (!validUserId) return res.status(400).json({ message: "Reset session expired or invalid" });
 
-        verifiedResetSessions.delete(validUserId);
-        const user = await User.findById(validUserId);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        user.password = await bcrypt.hash(newPassword, 10);
-        await user.save();
-        res.status(200).json({ message: "Password reset successfully" });
-    } catch (error) {
-        console.error("❌ Reset Password Error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-};
-
-// 🔹 Verify Reset Code Controller
-exports.verifyResetCode = async (req, res) => {
+// Verify Reset Code
+// Define the Map for storing sessions
+const verifyResetCode = async (req, res) => {
     try {
         const { otp } = req.body;
+
         if (!otp) {
             return res.status(400).json({ message: "Reset code is required" });
         }
@@ -222,3 +150,70 @@ exports.verifyResetCode = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+
+
+
+// Reset Password
+// Define the verifyOtpForUser function
+const verifiedResetSessions = new Map(); // Define an in-memory session store
+
+const resetPassword = async (req, res) => {
+    try {
+        const { newPassword } = req.body;
+        
+        // Look for the first valid session with an OTP that hasn't expired
+        const validUserId = [...verifiedResetSessions.keys()].find(
+            userId => verifiedResetSessions.get(userId) > Date.now()
+        );
+
+        if (!validUserId) {
+            return res.status(400).json({ message: "Reset session expired or invalid" });
+        }
+
+        // Remove the session as the OTP is verified
+        verifiedResetSessions.delete(validUserId);
+
+        // Find the user by ID
+        const user = await User.findById(validUserId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Hash and update the user's password
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successfully" });
+    } catch (error) {
+        console.error("❌ Reset Password Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+
+
+// Verify Email
+const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const user = await User.findOne({ verificationToken: token });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        user.isVerified = true;
+        user.verificationToken = null;
+        await user.save();
+
+        res.status(200).json({ message: "Email verified successfully!" });
+    } catch (error) {
+        console.error("❌ Email Verification Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+module.exports = { signup, login, verifyEmail, forgotPassword, verifyResetCode, resetPassword };
