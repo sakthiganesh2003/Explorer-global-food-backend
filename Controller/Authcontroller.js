@@ -135,7 +135,7 @@ const verifyResetCode = async (req, res) => {
 
         // Find the most recent valid reset code
         const resetRequest = await ResetPassword.findOne({ resetPasswordCode: otp })
-            .sort({ resetPasswordExpires: -1 });
+            .sort({ resetPasswordExpires: -1});
 
         if (!resetRequest || resetRequest.resetPasswordExpires < Date.now()) {
             return res.status(400).json({ message: "Invalid or expired reset code" });

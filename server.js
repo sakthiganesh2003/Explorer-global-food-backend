@@ -9,7 +9,6 @@ const app = express();
 const authRoutes = require("./Routes/Authroutes");
 
 
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,9 +22,7 @@ app.use(
 
 // API Routes
 app.use("/api/auth", authRoutes);
-//app.use("/api/user", require("./Routes/Authroutes"));
-// app.use("/api/profile", profileRoutes);
-// app.use("/api/booking", bookingRoutes);
+  // Make sure this matches the controller
 
 // MongoDB Connection
 mongoose
