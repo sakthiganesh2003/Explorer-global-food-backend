@@ -1,11 +1,11 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const User = require("../models/Users");
+const User = require("../Models/Users");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const ResetPassword = require("../models/ResetPassword");
-const otpStorage = require("../models/ResetPassword");
+const ResetPassword = require("../Models/ResetPassword");
+
 
 dotenv.config();
 

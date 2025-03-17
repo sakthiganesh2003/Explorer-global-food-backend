@@ -7,6 +7,7 @@ const app = express();
 
 // Import Routes
 const authRoutes = require("./Routes/Authroutes");
+//const maidRoutes = require("./Routes/Bookingroutes");
 
 
 // Middleware
@@ -22,6 +23,7 @@ app.use(
 
 // API Routes
 app.use("/api/auth", authRoutes);
+//app.use("/api/maids", Bookingroutes);
   // Make sure this matches the controller
 
 // MongoDB Connection
