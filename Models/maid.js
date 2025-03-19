@@ -11,3 +11,6 @@ const maidSchema = new mongoose.Schema({
 const Maid = mongoose.model("Maid", maidSchema);
 
 module.exports = Maid;
+
+// select cuisine
+

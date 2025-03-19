@@ -1,4 +1,5 @@
 const Maid = require("../Models/maid");
+const Cuisine = require("../Models/cusinie");
 
 // Fetch all maids
 const getMaids = async (req, res) => {
@@ -32,4 +33,41 @@ const addMaid = async (req, res) => {
   }
 };
 
-module.exports = { getMaids, addMaid };
+
+// select cusion
+
+
+
+// Fetch all cuisines
+const getCuisines = async (req, res) => {
+  try {
+    const cuisines = await Cuisine.find();
+    res.status(200).json(cuisines);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cuisines", error: error.message });
+  }
+};
+
+// Add a new cuisine
+const addCuisine = async (req, res) => {
+  try {
+    const { name, image } = req.body;
+    if (!name) {
+      return res.status(400).json({ message: "Cuisine name is required" });
+    }
+
+    const newCuisine = new Cuisine({ name, image });
+    await newCuisine.save();
+
+    res.status(201).json({ message: "Cuisine added successfully", cuisine: newCuisine });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding cuisine", error: error.message });
+  }
+};
+
+module.exports = {
+  getMaids,
+  addMaid,
+  getCuisines,
+  addCuisine,
+};
