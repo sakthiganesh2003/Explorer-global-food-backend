@@ -8,8 +8,10 @@ const app = express();
 // Import Routes
 const authRoutes = require("./Routes/Authroutes");
 const maidRoutes = require("./Routes/maidroutes");
-
-
+const maidDashRoutes = require('./Routes/maiddashroutes');
+const memberRoutes = require('./Routes/memberRoutes');
+const cuisineTypeRoutes = require("./Routes/cuisineTypeRoutes");
+const formMaidRoutes = require("./Routes/formmaidroutes");
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,6 +26,13 @@ app.use(
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/maids", maidRoutes);
+app.use('/api/maid/profile', maidDashRoutes);
+app.use('/api/members', memberRoutes);
+app.use("/api/cuisine-types", cuisineTypeRoutes);
+app.use('/api/frommaids', maidRoutes);
+
+
+
   // Make sure this matches the controller
 
 // MongoDB Connection
