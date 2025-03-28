@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const maidSchema = new mongoose.Schema({
+const formmaidSchema = new mongoose.Schema({
   fullName: String,
   email: String,
   phone: String,
@@ -12,4 +12,5 @@ const maidSchema = new mongoose.Schema({
   aadhaarNumber: String
 });
 
-module.exports = mongoose.model('Maid', maidSchema);
+module.exports = mongoose.model('formMaid', formmaidSchema);
+

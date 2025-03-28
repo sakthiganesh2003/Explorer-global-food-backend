@@ -4,7 +4,7 @@ const { getMaids, addMaid, getCuisines, addCuisine } = require("../Controller/ma
 const router = express.Router();
 
 router.get("/maids", getMaids);
-router.post("/", addMaid);
+//router.post("/", addMaid);
 
 router.get("/", getCuisines);
 router.post("/cusines", addCuisine);
