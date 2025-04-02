@@ -6,7 +6,7 @@ const auth = require('../middleware/auth'); // Make sure this path is correct
 // @route   GET api/maid-dashboard/profile
 // @desc    Get maid profile
 // @access  Private
-router.get('/profile', maiddashController.getMaidProfile);
+router.get('/:id', maiddashController.getMaidProfile);
 
 router.post('/profile', maiddashController.getMaidProfile);
 

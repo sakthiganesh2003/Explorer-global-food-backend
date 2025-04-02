@@ -6,6 +6,7 @@ const formmaidSchema = new mongoose.Schema({
     required: [true, 'Full name is required'],
     trim: true
   },
+    userId:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
   email: {
     type: String,
     required: [true, 'Email is required'],
