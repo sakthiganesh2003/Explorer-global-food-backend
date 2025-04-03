@@ -31,7 +31,7 @@ app.use(
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/maids", maidRoutes);
-app.use('/api/maid/profile', maidDashRoutes);
+app.use('/api/maid', maidDashRoutes);
 app.use('/api/members', memberRoutes);
 app.use("/api/cuisine-types", cuisineTypeRoutes);
 app.use('/api/formMaids', formMaidRoutes);

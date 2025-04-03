@@ -33,6 +33,7 @@ router.put('/:id', async (req, res) => {
         const cuisines = Array.isArray(application.specialties) ? application.specialties : [application.specialties || 'General'];
 
         const newMaid = new Maid({
+          userId:application.userId,
           fullName: application.fullName,
           specialties: cuisines,
           rating: 0,
