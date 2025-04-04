@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { addformMaid, getformMaids, updateStatusMaid } = require('../Controller/formmaidController');
+const { addformMaid, getformMaids, updateStatusMaid, deleteMaid, deleteMaids } = require('../Controller/formmaidController');
 const router = express.Router();
 const mongoose = require('mongoose');
 const formmaid = require('../Models/formmaid');
@@ -11,6 +11,12 @@ const Maid = require('../Models/maid'); // Assuming you have a Maid model define
 // Define routes
 router.post('/', upload.single('aadhaarPhoto'), addformMaid);
 router.get('/', getformMaids);
+// DELETE /api/maids/:id
+// router.delete('/:id', maidController.deleteMaid);
+// // DELETE /api/maids
+// router.delete('/', maidController.deleteMaids);
+// // Request body: { ids: ['id1', 'id2', 'id3'] }
+
 router.put('/:id', async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {

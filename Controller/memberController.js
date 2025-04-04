@@ -14,6 +14,7 @@ exports.addMember = async (req, res) => {
     const { dietaryPreference, allergies, specialRequests, mealQuantity } = req.body;
     
     const newMember = new Member({
+       // Make sure this is populated
       dietaryPreference,
       allergies: allergies || '',
       specialRequests: specialRequests || '',
@@ -23,7 +24,11 @@ exports.addMember = async (req, res) => {
     const savedMember = await newMember.save();
     res.status(201).json(savedMember);
   } catch (error) {
-    res.status(400).json({ message: 'Error adding member' });
+    console.error('Error adding member:', error); // Add this line
+    res.status(400).json({ 
+      message: 'Error adding member',
+      error: error.message // Include the error message in the response
+    });
   }
 };
 

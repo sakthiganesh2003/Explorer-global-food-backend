@@ -1,42 +1,100 @@
 const Schedule = require('../Models/timeSlotModel');
+// const ErrorResponse = require('../utils/errorResponse');
 
-exports.createSchedule = async (req, res) => {
+// Create a new schedule
+exports.createSchedule = async (req, res, next) => {
   try {
-    const { date, timeSlots } = req.body;
-
-    if (!date || !timeSlots || !timeSlots.length) {
-      return res.status(400).json({ 
-        error: 'Date and at least one time slot are required' 
-      });
+    const { date, times, address, phone, timeSlots, maidId } = req.body;
+    
+    if (!date || !times || !address || !phone || !timeSlots?.length || !maidId) {
+      return next(new ErrorResponse('All fields are required', 400));
     }
 
-    const newSchedule = new Schedule({
+    const schedule = await Schedule.create({
       date,
-      timeSlots
+      times,
+      address,
+      phone,
+      timeSlots,
+      maidId,
+      userId: req.user.id
     });
 
-    const savedSchedule = await newSchedule.save();
-    
-    res.status(201).json({
-      message: 'Schedule created successfully',
-      schedule: savedSchedule
-    });
+    res.status(201).json({ success: true, data: schedule });
   } catch (error) {
-    res.status(500).json({ 
-      error: 'Error creating schedule',
-      details: error.message 
-    });
+    next(error);
   }
 };
 
-exports.getSchedules = async (req, res) => {
+// Get all schedules
+exports.getSchedules = async (req, res, next) => {
   try {
-    const schedules = await Schedule.find().sort({ createdAt: -1 });
-    res.status(200).json(schedules);
+    const schedules = await Schedule.find({ userId: req.user.id });
+    res.status(200).json({ success: true, data: schedules });
   } catch (error) {
-    res.status(500).json({ 
-      error: 'Error fetching schedules',
-      details: error.message 
+    next(error);
+  }
+};
+
+// Get single schedule
+exports.getSchedule = async (req, res, next) => {
+  try {
+    const schedule = await Schedule.findById(req.params.id);
+    
+    if (!schedule) {
+      return next(new ErrorResponse('Schedule not found', 404));
+    }
+    
+    if (schedule.userId.toString() !== req.user.id) {
+      return next(new ErrorResponse('Not authorized', 401));
+    }
+    
+    res.status(200).json({ success: true, data: schedule });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update schedule
+exports.updateSchedule = async (req, res, next) => {
+  try {
+    let schedule = await Schedule.findById(req.params.id);
+    
+    if (!schedule) {
+      return next(new ErrorResponse('Schedule not found', 404));
+    }
+    
+    if (schedule.userId.toString() !== req.user.id) {
+      return next(new ErrorResponse('Not authorized', 401));
+    }
+    
+    schedule = await Schedule.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
     });
+    
+    res.status(200).json({ success: true, data: schedule });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Delete schedule
+exports.deleteSchedule = async (req, res, next) => {
+  try {
+    const schedule = await Schedule.findById(req.params.id);
+    
+    if (!schedule) {
+      return next(new ErrorResponse('Schedule not found', 404));
+    }
+    
+    if (schedule.userId.toString() !== req.user.id) {
+      return next(new ErrorResponse('Not authorized', 401));
+    }
+    
+    await schedule.remove();
+    res.status(200).json({ success: true, data: {} });
+  } catch (error) {
+    next(error);
   }
 };

@@ -257,9 +257,84 @@ const updateStatusMaid = async (req, res) => {
     });
   }
 };
+const deleteMaid = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Maid ID is required' 
+      });
+    }
+
+    const deletedMaid = await Maid.findByIdAndDelete(id);
+
+    if (!deletedMaid) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Maid not found' 
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Maid deleted successfully',
+      data: {
+        id: deletedMaid._id,
+        name: deletedMaid.fullName,
+        email: deletedMaid.email
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting maid:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+const deleteMaids = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Array of maid IDs is required' 
+      });
+    }
+
+    const deleteResult = await Maid.deleteMany({ _id: { $in: ids } });
+
+    if (deleteResult.deletedCount === 0) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'No maids found to delete' 
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `${deleteResult.deletedCount} maid(s) deleted successfully`
+    });
+  } catch (error) {
+    console.error('Error deleting multiple maids:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
 
 module.exports = { 
   addformMaid, 
   getformMaids,
-  updateStatusMaid 
+  updateStatusMaid,
+  deleteMaid,
+  deleteMaids 
 };

@@ -14,7 +14,7 @@ const cuisineTypeRoutes = require("./Routes/cuisineTypeRoutes");
 const formMaidRoutes = require("./Routes/formmaidroutes");
 const timeSlotRoutes = require("./Routes/timeSlotRoutes");
 const foodRoutes = require('./Routes/foodRoutes');
-
+// const bookingRoutes = require('./Routes/booking/selectmaidroutes');
 
 
 // Middleware
@@ -37,7 +37,7 @@ app.use("/api/cuisine-types", cuisineTypeRoutes);
 app.use('/api/formMaids', formMaidRoutes);
 app.use("/api/time", timeSlotRoutes);
 app.use('/api/foods', foodRoutes);
-
+// app.use('/api/booking', bookingRoutes);
 
 
   // Make sure this matches the controller
