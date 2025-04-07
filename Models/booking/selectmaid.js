@@ -1,50 +1,35 @@
 const mongoose = require('mongoose');
-const Maid = require('../maid');
-const Member = require('../member');
 
-const BookingSchema = new mongoose.Schema({
-  maid: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Maid',
-    required: [true, 'Please select a maid']
-  },
-  member: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Member',
-    required: [true, 'Please provide a member']
-  },
-  services: {
-    type: [String],
-    required: [true, 'Please select at least one service']
-  },
-  timeSlot: {
-    type: String,
-    required: [true, 'Please select a time slot']
-  },
-  notes: {
-    type: String,
-    maxlength: [500, 'Notes cannot exceed 500 characters']
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'confirmed', 'completed', 'cancelled'],
-    default: 'confirmed'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+const maidSchema = new mongoose.Schema({
+    fullName: {
+        type: String,
+        required: [true, 'Please add a full name']
+    },
+    cuisine: {
+        type: [String],
+        default: []
+    },
+    specialties: {
+        type: [String],
+        required: [true, 'Please add at least one specialty']
+    },
+    rating: {
+        type: Number,
+        min: [1, 'Rating must be at least 1'],
+        max: [5, 'Rating must not be more than 5'],
+        default: 3
+    },
+    experience: {
+        type: Number,
+        required: [true, 'Please add years of experience']
+    },
+    image: {
+        type: String
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
-// Static method to check maid availability
-BookingSchema.statics.isMaidAvailable = async function(maidId, timeSlot) {
-  const existingBooking = await this.findOne({
-    maid: maidId,
-    timeSlot,
-    status: { $in: ['confirmed', 'pending'] }
-  });
-  
-  return !existingBooking;
-};
-
-module.exports = mongoose.model('Booking', BookingSchema);
+module.exports = mongoose.model('selectMaid', maidSchema);

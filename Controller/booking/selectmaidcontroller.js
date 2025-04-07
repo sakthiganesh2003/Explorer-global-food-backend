@@ -1,79 +1,103 @@
-const Maid = require('../../Models/maid');
-const Booking = require('../../Models/booking/selectmaid');
-const asyncHandler = require('../../middleware/asyncHandler');
-const ErrorResponse = require('../../utils/ErrorResponse');
+const express = require('express');
+const { MongoClient, ObjectId } = require('mongodb');
 
-// @desc    Get available maids
-// @route   GET /api/v1/booking/maids
-// @access  Public
-exports.getAvailableMaids = asyncHandler(async (req, res, next) => {
+const router = express.Router();
+
+// MongoDB connection URI
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const client = new MongoClient(uri);
+
+// Connect to MongoDB
+async function connectToDB() {
   try {
-    const { cuisine, specialties, minRating, timeSlot } = req.query;
+    await client.connect();
+    console.log('Connected to MongoDB');
+  } catch (err) {
+    console.error('Error connecting to MongoDB:', err);
+  }
+}
+
+connectToDB();
+
+// Endpoint to get all maids
+router.get('/maids', async (req, res) => {
+  try {
+    const database = client.db('maidServiceDB');
+    const maidsCollection = database.collection('maids');
     
-    // Build filter object
-    const filters = {};
+    const maids = await maidsCollection.find({}).toArray();
+    res.status(200).json(maids);
+  } catch (error) {
+    console.error('Error fetching maids:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Endpoint to select a specific maid by ID
+router.post('/select-maid/:id', async (req, res) => {
+  try {
+    const maidId = req.params;
     
-    if (cuisine) filters.cuisine = { $in: cuisine.split(',') };
-    if (specialties) filters.specialties = { $in: specialties.split(',') };
-    if (minRating) filters.rating = { $gte: Number(minRating) };
-    
-    // Find all maids matching filters
-    let maids = await Maid.find(filters);
-    
-    // If timeSlot is provided, filter for availability
-    if (timeSlot) {
-      maids = await Promise.all(
-        maids.map(async maid => {
-          const isAvailable = await Booking.isMaidAvailable(maid._id, timeSlot);
-          return isAvailable ? maid : null;
-        })
-      );
-      maids = maids.filter(maid => maid !== null);
+    // Validate the ID format
+    if (!ObjectId.isValid(maidId)) {
+      return res.status(400).json({ message: 'Invalid maid ID format' });
     }
+
+    const database = client.db('maidServiceDB');
+    const maidsCollection = database.collection('maids');
+    
+    // Find the maid by ID
+    const maid = await maidsCollection.findOne({ _id: new ObjectId(maidId) });
+    
+    if (!maid) {
+      return res.status(404).json({ message: 'Maid not found' });
+    }
+
+    // Here you would typically add logic to associate the maid with a user
+    // For example, add to user's selected maids or create a booking
     
     res.status(200).json({
-      success: true,
-      count: maids.length,
-      data: maids
+      message: 'Maid selected successfully',
+      maid: {
+        id: maid._id,
+        name: maid.fullName,
+        specialties: maid.specialties,
+        rating: maid.rating
+      }
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.error('Error selecting maid:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// @desc    Select a maid
-// @route   POST /api/v1/booking/select-maid
-// @access  Private
-exports.selectMaid = asyncHandler(async (req, res, next) => {
+// Endpoint to filter maids by criteria
+router.get('/maids/filter', async (req, res) => {
   try {
-    const { maidId, memberId, services, timeSlot, notes } = req.body;
-    
-    // Validate required fields
-    if (!maidId || !memberId || !timeSlot) {
-      return next(new ErrorResponse('Missing required fields (maidId, memberId, timeSlot)', 400));
+    const { cuisine, minRating, specialty } = req.query;
+    const filter = {};
+
+    if (cuisine) {
+      filter.cuisine = { $in: Array.isArray(cuisine) ? cuisine : [cuisine] };
     }
-    
-    // Check maid availability
-    const isAvailable = await Booking.isMaidAvailable(maidId, timeSlot);
-    if (!isAvailable) {
-      return next(new ErrorResponse('Maid is not available for the selected time slot', 400));
+
+    if (minRating) {
+      filter.rating = { $gte: Number(minRating) };
     }
+
+    if (specialty) {
+      filter.specialties = { $in: Array.isArray(specialty) ? specialty : [specialty] };
+    }
+
+    const database = client.db('maidServiceDB');
+    const maidsCollection = database.collection('maids');
     
-    // Create booking
-    const booking = await Booking.create({
-      maid: maidId,
-      member: memberId,
-      services,
-      timeSlot,
-      notes,
-      status: 'confirmed'
-    });
-    
-    res.status(201).json({
-      success: true,
-      data: booking
-    });
-  } catch (err) {
-    next(err);
+    const maids = await maidsCollection.find(filter).toArray();
+    res.status(200).json(maids);
+  } catch (error) {
+    console.error('Error filtering maids:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+module.exports = router;
