@@ -19,10 +19,12 @@ router.get('/', getformMaids);
 
 router.put('/:id', async (req, res) => {
   try {
+    // Validate the application ID
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid ID format' });
+      return res.status(400).json({ success: false, message: 'Invalid application ID format' });
     }
 
+    // Update the maid application status
     const application = await formmaid.findByIdAndUpdate(
       req.params.id,
       { status: req.body.status },
@@ -35,17 +37,33 @@ router.put('/:id', async (req, res) => {
 
     if (req.body.status === 'approved') {
       try {
-        console.log(application.specialties)
-        const cuisines = Array.isArray(application.specialties) ? application.specialties : [application.specialties || 'General'];
+        // Ensure specialties is an array
+        const cuisines = Array.isArray(application.specialties)
+          ? application.specialties
+          : [application.specialties || 'General'];
+
+        // Normalize experience (remove " years" and ensure valid enum value)
+        const experienceValue = application.experience
+          ? application.experience// Remove " years" suffix
+          : '0-1'; // Default value
+
+        // Validate userId as ObjectId
+        if (!mongoose.Types.ObjectId.isValid(application.userId)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid userId format: Must be a valid ObjectId'
+          });
+        }
 
         const newMaid = new Maid({
-          userId:application.userId,
+          userId: application.userId, // Should be an ObjectId
           fullName: application.fullName,
           specialties: cuisines,
           rating: 0,
-          experience: application.experience || '0-1 years', // Defaulting to valid enum value
+          experience: experienceValue, // Normalized value
           image: application.image || 'default.jpg'
         });
+
         console.log('New Maid:', newMaid); // Debugging line
         await newMaid.save();
 
@@ -56,14 +74,19 @@ router.put('/:id', async (req, res) => {
           message: 'Maid application approved and added to system'
         });
       } catch (saveError) {
-        return res.status(500).json({ success: false, message: 'Error creating Maid: ' + saveError.message });
+        console.error('Error creating Maid:', saveError);
+        return res.status(500).json({
+          success: false,
+          message: 'Error creating Maid: ' + saveError.message
+        });
       }
     }
 
     res.json({ success: true, data: application, message: 'Status updated successfully' });
-
   } catch (err) {
+    console.error('Server error:', err);
     res.status(500).json({ success: false, message: 'Server error: ' + err.message });
   }
 });
+
 module.exports = router;

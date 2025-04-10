@@ -29,7 +29,7 @@ const bookingSchema = new mongoose.Schema({
   },
   maid: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Maid',
     required: true,
   },
   cuisine: {

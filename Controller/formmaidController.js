@@ -1,6 +1,29 @@
 const Maid = require('../Models/formmaid');
+const multer = require('multer'); 
+const fs = require('fs');
+const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const express = require('express');
+const formmaid = require('../Models/formmaid');
+const app = express();
+// Multer setup - Use diskStorage to save files and get a path
+// Configure Cloudinary
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-// Helper function for validation
+// Multer setup with memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Validation helper
 const validateInputs = (data) => {
   const errors = [];
   
@@ -15,149 +38,117 @@ const validateInputs = (data) => {
   if (!data.bio?.trim()) errors.push('Bio is required');
   if (!data.aadhaarNumber?.trim()) errors.push('Aadhaar number is required');
   if (!data.aadhaarPhoto) errors.push('Aadhaar photo is required');
-  if (!data.bankAccountNumber?.trim()) errors.push('Bank account number is required');
-  if (!data.bankName?.trim()) errors.push('Bank name is required');
-  if (!data.ifscCode?.trim()) errors.push('IFSC code is required');
-  if (!data.accountHolderName?.trim()) errors.push('Account holder name is required');
+  if (!data.bankDetails?.accountNumber?.trim()) errors.push('Bank account number is required');
+  if (!data.bankDetails?.bankName?.trim()) errors.push('Bank name is required');
+  if (!data.bankDetails?.ifscCode?.trim()) errors.push('IFSC code is required');
+  if (!data.bankDetails?.accountHolderName?.trim()) errors.push('Account holder name is required');
 
-  // Additional format validation
-  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    errors.push('Invalid email format');
-  }
-  if (data.phone && !/^\d{10}$/.test(data.phone)) {
-    errors.push('Phone number must be 10 digits');
-  }
-  if (data.aadhaarNumber && !/^\d{12}$/.test(data.aadhaarNumber)) {
-    errors.push('Aadhaar number must be 12 digits');
-  }
-  if (data.bankAccountNumber && !/^\d{9,18}$/.test(data.bankAccountNumber)) {
-    errors.push('Invalid bank account number (9-18 digits required)');
-  }
-  if (data.ifscCode && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(data.ifscCode)) {
-    errors.push('Invalid IFSC code format (e.g., ICIC0001359)');
-  }
+  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.push('Invalid email format');
+  if (data.phone && !/^\d{10}$/.test(data.phone)) errors.push('Phone number must be 10 digits');
+  if (data.aadhaarNumber && !/^\d{12}$/.test(data.aadhaarNumber)) errors.push('Aadhaar number must be 12 digits');
+  if (data.bankDetails?.accountNumber && !/^\d{9,18}$/.test(data.bankDetails.accountNumber)) errors.push('Invalid bank account number');
+  if (data.bankDetails?.ifscCode && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(data.bankDetails.ifscCode)) errors.push('Invalid IFSC code format');
   
   return errors;
 };
 
+// Controller: addformMaid
 const addformMaid = async (req, res) => {
   console.log('Received maid application:', req.body);
-  
+  console.log('Uploaded file:', req.file);
+
   try {
-    const { 
-      userId,
-      fullName, 
-      email, 
-      phone, 
-      experience, 
-      specialties, 
-      bio, 
-      aadhaarNumber,
-      aadhaarPhoto,
-      bankDetails
-    } = req.body;
+    // Process specialties
+    let specialties = [];
+    if (typeof req.body.specialties === 'string') {
+      try {
+        specialties = JSON.parse(req.body.specialties);
+      } catch (e) {
+        specialties = req.body.specialties.split(',').map(s => s.trim().replace(/["']/g, ''));
+      }
+    } else if (Array.isArray(req.body.specialties)) {
+      specialties = req.body.specialties;
+    }
 
-    const {
-      accountNumber,
-      bankName,
-      ifscCode,
-      accountHolderName
-    } = bankDetails || {};
+    // Normalize experience
+    let experience = req.body.experience;
+    if (experience && !experience.includes('years')) {
+      experience = `${experience} years`;
+    }
 
-    // Validate inputs
-    const validateInputs = (data) => {
-      const errors = [];
-      if (!data.userId) errors.push('User ID is required');
-      if (!data.fullName?.trim()) errors.push('Full name is required');
-      if (!data.email?.trim()) errors.push('Email is required');
-      if (!data.phone?.trim()) errors.push('Phone is required');
-      if (!data.experience) errors.push('Experience is required');
-      if (!data.specialties || (Array.isArray(data.specialties) && data.specialties.length === 0)) {
-        errors.push('At least one specialty is required');
-      }
-      if (!data.bio?.trim()) errors.push('Bio is required');
-      if (!data.aadhaarNumber?.trim()) errors.push('Aadhaar number is required');
-      if (!data.aadhaarPhoto) errors.push('Aadhaar photo is required');
-      if (!data.bankDetails?.accountNumber?.trim()) errors.push('Bank account number is required');
-      if (!data.bankDetails?.bankName?.trim()) errors.push('Bank name is required');
-      if (!data.bankDetails?.ifscCode?.trim()) errors.push('IFSC code is required');
-      if (!data.bankDetails?.accountHolderName?.trim()) errors.push('Account holder name is required');
+    // Upload aadhaarPhoto to Cloudinary if file exists
+    let aadhaarPhotoUrl = null;
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: 'image', folder: 'maid_aadhaar' },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+      aadhaarPhotoUrl = result.secure_url;
+      console.log('Cloudinary upload result:', aadhaarPhotoUrl);
+    }
 
-      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        errors.push('Invalid email format');
-      }
-      if (data.phone && !/^\d{10}$/.test(data.phone)) {
-        errors.push('Phone number must be 10 digits');
-      }
-      if (data.aadhaarNumber && !/^\d{12}$/.test(data.aadhaarNumber)) {
-        errors.push('Aadhaar number must be 12 digits');
-      }
-      if (data.bankDetails?.accountNumber && !/^\d{9,18}$/.test(data.bankDetails.accountNumber)) {
-        errors.push('Invalid bank account number (9-18 digits required)');
-      }
-      if (data.bankDetails?.ifscCode && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(data.bankDetails.ifscCode)) {
-        errors.push('Invalid IFSC code format (e.g., ICIC0001359)');
-      }
-      
-      return errors;
+    // Extract bank details
+    const bankDetails = req.body.bankDetails || {};
+    const maidData = {
+      userId: req.body.userId,
+      fullName: req.body.fullName,
+      email: req.body.email,
+      phone: req.body.phone,
+      experience: experience,
+      specialties: specialties,
+      bio: req.body.bio,
+      aadhaarNumber: req.body.aadhaarNumber,
+      aadhaarPhoto: aadhaarPhotoUrl,
+      bankDetails: {
+        accountNumber: bankDetails.accountNumber,
+        bankName: bankDetails.bankName,
+        ifscCode: bankDetails.ifscCode,
+        accountHolderName: bankDetails.accountHolderName
+      },
+      image: aadhaarPhotoUrl, // Use aadhaarPhoto as image (adjust if separate)
+      rating: 0 // Default rating
     };
 
-    const validationErrors = validateInputs(req.body);
+    // Validate data
+    const validationErrors = validateInputs(maidData);
+    console.log('Validation errors:', validationErrors);
     if (validationErrors.length > 0) {
       return res.status(400).json({ 
-        success: false,
+        success: false, 
         message: 'Validation failed',
         errors: validationErrors 
       });
     }
 
-    // Process specialties
-    let specialtiesArray = specialties;
-    if (typeof specialties === 'string') {
-      specialtiesArray = specialties.split(',').map(s => s.trim());
-    } else if (!Array.isArray(specialties)) {
-      specialtiesArray = [];
-    }
-
-    // Check for existing maid
-    const existingMaid = await Maid.findOne({ 
-      $or: [{ email }, { phone }, { aadhaarNumber }] 
-    }).collation({ locale: 'en', strength: 2 });
+     // Adjust path as needed
+    const existingMaid = await formmaid.findOne({
+      $or: [
+        { email: maidData.email.toLowerCase() },
+        { phone: maidData.phone },
+        { aadhaarNumber: maidData.aadhaarNumber }
+      ]
+    });
+    console.log('Existing maid:', existingMaid ? existingMaid._id : 'None');
 
     if (existingMaid) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
-        message: 'Maid with this email, phone, or Aadhaar number already exists',
-        existingId: existingMaid._id
+        message: 'Maid with this email, phone, or Aadhaar number already exists'
       });
     }
 
-    // Create new maid
-    const maid = new Maid({
-      userId,
-      fullName: fullName.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone.trim(),
-      experience,
-      specialties: specialtiesArray,
-      bio: bio.trim(),
-      aadhaarPhoto,
-      aadhaarNumber: aadhaarNumber.trim(),
-      bankDetails: {
-        accountNumber: accountNumber.trim(),
-        bankName: bankName.trim(),
-        ifscCode: ifscCode.trim().toUpperCase(),
-        accountHolderName: accountHolderName.trim()
-      },
-      status: 'pending',
-      createdAt: new Date()
-    });
-
+    // Save to database
+    const maid = new Maid(maidData);
     const savedMaid = await maid.save();
-    
-    console.log('Maid application saved successfully:', savedMaid._id);
-    
-    return res.status(201).json({ 
+    console.log('Maid saved:', savedMaid._id);
+
+    res.status(201).json({
       success: true,
       message: 'Maid application submitted successfully',
       data: {
@@ -169,8 +160,8 @@ const addformMaid = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error adding maid:', error);
-    return res.status(500).json({ 
+    console.error('Error submitting maid application:', error);
+    res.status(500).json({
       success: false,
       message: 'Internal server error',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -210,11 +201,14 @@ const getformMaids = async (req, res) => {
   }
 };
 
+const mongoose = require('mongoose');
+
 const updateStatusMaid = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
+    // Validate input
     if (!id || !status) {
       return res.status(400).json({ 
         success: false,
@@ -230,23 +224,73 @@ const updateStatusMaid = async (req, res) => {
       });
     }
 
-    const updatedMaid = await Maid.findByIdAndUpdate(
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid maid ID format' 
+      });
+    }
+
+    // Update the formmaid record
+    const updatedFormMaid = await FormMaid.findByIdAndUpdate(
       id,
       { status },
       { new: true, runValidators: true }
     ).select('-__v');
 
-    if (!updatedMaid) {
+    if (!updatedFormMaid) {
       return res.status(404).json({ 
         success: false,
-        message: 'Maid not found' 
+        message: 'Maid application not found' 
       });
+    }
+
+    // If status is 'approved', create a new record in the maid collection
+    if (status === 'approved') {
+      const maidData = {
+        userId: updatedFormMaid.userId,
+        fullName: updatedFormMaid.fullName,
+        email: updatedFormMaid.email,
+        phone: updatedFormMaid.phone,
+        experience: updatedFormMaid.experience,
+        specialties: updatedFormMaid.specialties,
+        bio: updatedFormMaid.bio,
+        aadhaarNumber: updatedFormMaid.aadhaarNumber,
+        aadhaarPhoto: updatedFormMaid.aadhaarPhoto,
+        bankDetails: updatedFormMaid.bankDetails,
+        image: updatedFormMaid.image || updatedFormMaid.aadhaarPhoto, // Fallback to aadhaarPhoto
+        rating: updatedFormMaid.rating || 0, // Default if not present
+        status: 'active', // Initial status for new maid record
+        createdAt: new Date()
+      };
+
+      // Check if maid already exists in the maid collection
+      const existingMaid = await Maid.findOne({
+        $or: [
+          { email: maidData.email.toLowerCase() },
+          { phone: maidData.phone },
+          { aadhaarNumber: maidData.aadhaarNumber }
+        ]
+      });
+
+      if (existingMaid) {
+        return res.status(409).json({
+          success: false,
+          message: 'Approved maid with this email, phone, or Aadhaar number already exists'
+        });
+      }
+
+      // Create new maid record
+      const newMaid = new Maid(maidData);
+      const savedMaid = await newMaid.save();
+      console.log('New maid created:', savedMaid._id);
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Maid status updated successfully',
-      data: updatedMaid
+      message: 'Maid status updated successfully' + (status === 'approved' ? ' and new maid record created' : ''),
+      data: updatedFormMaid
     });
   } catch (error) {
     console.error('Error updating maid status:', error);
@@ -257,6 +301,8 @@ const updateStatusMaid = async (req, res) => {
     });
   }
 };
+
+module.exports = { updateStatusMaid };
 const deleteMaid = async (req, res) => {
   try {
     const { id } = req.params;
