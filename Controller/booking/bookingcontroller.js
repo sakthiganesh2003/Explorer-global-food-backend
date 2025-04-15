@@ -66,13 +66,16 @@ exports.createBooking = async (req, res) => {
       'time.date': requestedDate,
       status: { $ne: 'cancelled' } // Exclude cancelled bookings
     });
-
+    console.log('Existing bookings:', existingBookings); // Log existing bookings for debugging
+    existingBookings.forEach(booking => {
+      console.log('Booking time:', booking.time.time); // Log each booking time for debugging 
+    })
     // Check for time conflicts
     const hasConflict = existingBookings.some(existingBooking => {
       const existingTimes = Array.isArray(existingBooking.time.time) 
         ? existingBooking.time.time 
         : [existingBooking.time.time];
-      
+      // Log existing times for debugging
       return existingTimes.some(existingTime => {
         const [existingStart, existingEnd] = existingTime.includes('-')
           ? existingTime.split('-').map(t => 

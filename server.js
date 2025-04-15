@@ -17,6 +17,8 @@ const foodRoutes = require('./Routes/foodRoutes');
 // const bookingRoutes = require('./Routes/booking/selectmaidroutes');
 // const selectMaidRouter = require('./Routes/booking/selectmaidroutes');
 const bookingRoutes = require('./Routes/booking/bookingroutes');
+const paymentRoutes = require('./Routes/payments/paymentrouts');
+// const modeofpaymentRoutes = require('./Routes/payments/');
 
 
 // Middleware
@@ -42,7 +44,8 @@ app.use('/api/foods', foodRoutes);
 // app.use('/api/booking', bookingRoutes);
 // app.use('/api/maids', selectMaidRouter);
 app.use('/api/bookings', bookingRoutes);
-
+app.use('/api/payments', paymentRoutes);
+// app.use('/api/modeofpayment', modeofpaymentRoutes);
 
 
   // Make sure this matches the controller
