@@ -1,5 +1,7 @@
 const Maid = require("../Models/maid");
 const Cuisine = require("../Models/cusinie");
+const { updateMaidProfile } = require("./maiddashController");
+const { updateStatusMaid } = require("./formmaidController");
 
 // Fetch all maids
 const getMaids = async (req, res) => {
@@ -63,6 +65,75 @@ const addCuisine = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error adding cuisine", error: error.message });
   }
+  
+};
+
+const toggleMaidStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { active } = req.body;
+
+    if (typeof active !== "boolean") {
+      return res.status(400).json({ message: "Active status must be a boolean" });
+    }
+
+    const maid = await Maid.findByIdAndUpdate(
+      id,
+      { active },
+      { new: true, runValidators: false } // runValidators: false to skip validation for other fields
+    );
+
+    if (!maid) {
+      return res.status(404).json({ message: "Maid not found" });
+    }
+
+    res.status(200).json({ message: `Maid ${active ? "activated" : "deactivated"} successfully`, maid });
+  } catch (error) {
+    console.error("Error toggling maid status:", error);
+    res.status(500).json({ message: "Error toggling maid status", error: error.message });
+  }
+  // const updateMaid = async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const { active, fullName, specialties, experience, image } = req.body;
+  
+  //     const updateData = {};
+  //     if (typeof active === "boolean") {
+  //       updateData.active = active;
+  //     }
+  //     if (fullName && specialties && Array.isArray(specialties) && experience) {
+  //       updateData.fullName = fullName;
+  //       updateData.specialties = specialties;
+  //       updateData.experience = experience;
+  //       if (image) updateData.image = image;
+  //     }
+  
+  //     if (Object.keys(updateData).length === 0) {
+  //       return res.status(400).json({ message: "No valid fields provided for update" });
+  //     }
+  
+  //     const validExperiences = ["0-1 years", "1-3 years", "3-5 years", "5+ years"];
+  //     if (updateData.experience && !validExperiences.includes(updateData.experience)) {
+  //       return res.status(400).json({ message: "Invalid experience value" });
+  //     }
+  
+  //     const maid = await Maid.findByIdAndUpdate(
+  //       id,
+  //       updateData,
+  //       { new: true, runValidators: true }
+  //     );
+  
+  //     if (!maid) {
+  //       return res.status(404).json({ message: "Maid not found" });
+  //     }
+  
+  //     res.status(200).json({ message: "Maid updated successfully", maid });
+  //   } catch (error) {
+  //     console.error("Error updating maid:", error);
+  //     res.status(500).json({ message: "Error updating maid", error: error.message });
+  //   }
+  // };
+
 };
 
 module.exports = {
@@ -70,4 +141,8 @@ module.exports = {
   addMaid,
   getCuisines,
   addCuisine,
+  toggleMaidStatus,
+  // updateMaid
+
+  
 };

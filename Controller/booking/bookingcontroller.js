@@ -4,7 +4,7 @@ const Maid = require('../../Models/maid');
 const User = require('../../Models/Users'); // Adjust path to your user model file
 // Create a new booking
 exports.createBooking = async (req, res) => {
-  console.log('Booking request body:', req.body); // Log the request body for debugging 
+  console.log('Booking request body:', req.body);
   try {
     // Validate required fields
     if (!req.body.userId || !req.body.maid || !req.body.time || !req.body.time.date || !req.body.time.time) {
@@ -14,10 +14,20 @@ exports.createBooking = async (req, res) => {
       });
     }
 
+    // Validate date format and ensure it's not in the past
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const requestedDate = req.body.time.date;
+    if (!dateRegex.test(requestedDate) || new Date(requestedDate) < new Date().setHours(0, 0, 0, 0)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or past date'
+      });
+    }
+
     // Validate that userId and maid exist
     const [user, maid] = await Promise.all([
       User.findById(req.body.userId),
-      User.findById(req.body.maid) // Changed from req.body.Maid to req.body.maid
+      User.findById(req.body.maid)
     ]);
 
     if (!user || !maid) {
@@ -27,11 +37,8 @@ exports.createBooking = async (req, res) => {
       });
     }
 
-    // Extract date and time from the request
-    const requestedDate = req.body.time.date;
+    // Extract and normalize time slots
     let requestedTimes = req.body.time.time;
-
-    // Handle case where time is a string
     if (typeof requestedTimes === 'string') {
       requestedTimes = [requestedTimes];
     }
@@ -43,16 +50,23 @@ exports.createBooking = async (req, res) => {
       });
     }
 
-    // Parse each time slot
+    // Validate time format
+    const timeRegex = /^(\d{1,2}:\d{2}\s?[AP]M)(-\d{1,2}:\d{2}\s?[AP]M)?$/i;
+    if (!requestedTimes.every(time => timeRegex.test(time))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid time format. Use "HH:MM AM/PM" or "HH:MM AM/PM-HH:MM AM/PM"'
+      });
+    }
+
+    // Parse requested time slots
     const timeSlots = requestedTimes.map(timeSlot => {
-      // Handle case where time is just "HH:MM AM/PM" without end time
       if (!timeSlot.includes('-')) {
-        return {
-          start: new Date(`${requestedDate}T${convertTo24HourFormat(timeSlot)}:00`),
-          end: new Date(`${requestedDate}T${convertTo24HourFormat(timeSlot)}:00`)
-        };
+        const startTime = convertTo24HourFormat(timeSlot);
+        const start = new Date(`${requestedDate}T${startTime}:00`);
+        const end = new Date(start.getTime() + 60 * 60 * 1000); // Add 1 hour
+        return { start, end };
       }
-      
       const [startTime, endTime] = timeSlot.split('-').map(t => t.trim());
       return {
         start: new Date(`${requestedDate}T${convertTo24HourFormat(startTime)}:00`),
@@ -60,37 +74,38 @@ exports.createBooking = async (req, res) => {
       };
     });
 
-    // Check for existing bookings for the maid on the requested date
+    // Check for existing bookings
     const existingBookings = await Booking.find({
       maid: req.body.maid,
       'time.date': requestedDate,
-      status: { $ne: 'cancelled' } // Exclude cancelled bookings
+      status: { $ne: 'cancelled' }
     });
-    console.log('Existing bookings:', existingBookings); // Log existing bookings for debugging
-    existingBookings.forEach(booking => {
-      console.log('Booking time:', booking.time.time); // Log each booking time for debugging 
-    })
+    console.log('Existing bookings:', existingBookings);
+
     // Check for time conflicts
     const hasConflict = existingBookings.some(existingBooking => {
       const existingTimes = Array.isArray(existingBooking.time.time) 
         ? existingBooking.time.time 
         : [existingBooking.time.time];
-      // Log existing times for debugging
+      
       return existingTimes.some(existingTime => {
         const [existingStart, existingEnd] = existingTime.includes('-')
           ? existingTime.split('-').map(t => 
               new Date(`${existingBooking.time.date}T${convertTo24HourFormat(t.trim())}:00`))
           : [
               new Date(`${existingBooking.time.date}T${convertTo24HourFormat(existingTime)}:00`),
-              new Date(`${existingBooking.time.date}T${convertTo24HourFormat(existingTime)}:00`)
+              new Date(new Date(`${existingBooking.time.date}T${convertTo24HourFormat(existingTime)}:00`).getTime() + 60 * 60 * 1000)
             ];
-
-        return timeSlots.some(requestedSlot => 
-          isTimeOverlap(
+        
+        const conflict = timeSlots.some(requestedSlot => {
+          const overlap = isTimeOverlap(
             requestedSlot.start, requestedSlot.end,
             existingStart, existingEnd
-          )
-        );
+          );
+          console.log(`Checking conflict: Requested [${requestedSlot.start.toISOString()} - ${requestedSlot.end.toISOString()}] vs Existing [${existingStart.toISOString()} - ${existingEnd.toISOString()}] -> Overlap: ${overlap}`);
+          return overlap;
+        });
+        return conflict;
       });
     });
 
@@ -105,7 +120,7 @@ exports.createBooking = async (req, res) => {
     const bookingData = {
       ...req.body,
       status: 'pending',
-      totalAmount: calculateTotalAmount({...req.body, maid}) // Include maid data for calculation
+      totalAmount: calculateTotalAmount({ ...req.body, maid })
     };
 
     const newBooking = new Booking(bookingData);
@@ -116,7 +131,8 @@ exports.createBooking = async (req, res) => {
       .populate('userId', 'name email')
       .populate('maid', 'name email');
 
-    res.status(201).json({
+    res.status(201).json(
+  {
       success: true,
       data: populatedBooking,
       message: 'Booking created successfully'
@@ -144,25 +160,32 @@ function convertTo24HourFormat(timeStr) {
 }
 
 function isTimeOverlap(start1, end1, start2, end2) {
-  return start1 < end2 && end1 > start2;
+  return start1 <= end2 && end1 >= start2;
 }
 
 function calculateTotalAmount(bookingData) {
   let total = 0;
   
-  // Calculate maid service cost
   if (bookingData.maid?.hourlyRate && bookingData.time?.time) {
     const timeSlots = Array.isArray(bookingData.time.time) ? bookingData.time.time : [bookingData.time.time];
-    const hours = timeSlots.length; // Assuming each slot is 1 hour
-    total += bookingData.maid.hourlyRate * hours;
+    let totalHours = 0;
+    timeSlots.forEach(slot => {
+      if (slot.includes('-')) {
+        const [start, end] = slot.split('-').map(t => convertTo24HourFormat(t.trim()));
+        const startTime = new Date(`1970-01-01T${start}:00`);
+        const endTime = new Date(`1970-01-01T${end}:00`);
+        totalHours += (endTime - startTime) / (60 * 60 * 1000);
+      } else {
+        totalHours += 1; // Assume 1 hour for single-point times
+      }
+    });
+    total += bookingData.maid.hourlyRate * totalHours;
   }
   
-  // Add cuisine price if exists
   if (bookingData.cuisine?.price) {
     total += bookingData.cuisine.price;
   }
   
-  // Add confirmed foods
   if (bookingData.confirmedFoods?.length) {
     total += bookingData.confirmedFoods.reduce(
       (sum, food) => sum + (food.price * food.quantity), 0

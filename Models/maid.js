@@ -13,7 +13,15 @@ const maidSchema = new mongoose.Schema({
       message: 'Please select a valid experience range'
     }
   },
-  image: { type: String, required: true }
+  image: { type: String, required: true },
+  active: {
+    type: Boolean,
+    default: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  }
 });
 
 const Maid = mongoose.model("Maid", maidSchema);
