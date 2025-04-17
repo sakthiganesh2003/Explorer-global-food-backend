@@ -7,6 +7,7 @@ const app = express();
 
 // Import Routes
 const authRoutes = require("./Routes/Authroutes");
+
 const maidRoutes = require("./Routes/maidroutes");
 const maidDashRoutes = require('./Routes/maiddashroutes');
 const memberRoutes = require('./Routes/memberRoutes');
@@ -16,8 +17,13 @@ const timeSlotRoutes = require("./Routes/timeSlotRoutes");
 const foodRoutes = require('./Routes/foodRoutes');
 // const bookingRoutes = require('./Routes/booking/selectmaidroutes');
 // const selectMaidRouter = require('./Routes/booking/selectmaidroutes');
+
+//booking
 const bookingRoutes = require('./Routes/booking/bookingroutes');
-const paymentRoutes = require('./Routes/payments/paymentrouts');
+
+// payments
+const paymentRoutes = require('./Routes/payments/paymentroutes.js');
+
 // const modeofpaymentRoutes = require('./Routes/payments/');
 
 
@@ -31,6 +37,8 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
   })
 );
+
+
 
 // API Routes
 app.use("/api/auth", authRoutes);
