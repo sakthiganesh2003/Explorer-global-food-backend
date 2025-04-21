@@ -1,13 +1,13 @@
-import mongoose from "mongoose";
-import AutoIncrementFactory from "mongoose-sequence";
+const mongoose = require('mongoose');
+const AutoIncrementFactory = require('mongoose-sequence');
 
 const connection = mongoose.connection;
 const AutoIncrement = AutoIncrementFactory(connection);
 
 const ModeOfPaymentSchema = new mongoose.Schema(
   {
-    modeOfPayment: { 
-      type: String, 
+    modeOfPayment: {
+      type: String,
       required: true,
       enum: ['gpay', 'razorpay', 'cash', 'bank_transfer', 'phonepe', 'upi', 'other'],
       default: 'razorpay'
@@ -16,13 +16,13 @@ const ModeOfPaymentSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    bookingId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Booking", 
-      required: true 
+    bookingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Booking',
+      required: true
     },
-    details: { 
-      type: mongoose.Schema.Types.Mixed 
+    details: {
+      type: mongoose.Schema.Types.Mixed
     },
     isActive: {
       type: Boolean,
@@ -37,8 +37,8 @@ const ModeOfPaymentSchema = new mongoose.Schema(
     iconUrl: String,
     notes: String
   },
-  { 
-    timestamps: { createdAt: "createdAt" },
+  {
+    timestamps: { createdAt: 'createdAt' },
     toJSON: {
       virtuals: true,
       transform: function(doc, ret) {
@@ -53,18 +53,18 @@ const ModeOfPaymentSchema = new mongoose.Schema(
 
 const PaymentSchema = new mongoose.Schema(
   {
-    modeOfPaymentId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "ModeOfPayment", 
-      required: true 
+    modeOfPaymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ModeOfPayment',
+      required: true
     },
-    bookingId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Booking", 
-      required: true 
+    bookingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Booking',
+      required: true
     },
-    amount: { 
-      type: Number, 
+    amount: {
+      type: Number,
       required: true,
       validate: {
         validator: function(value) {
@@ -80,58 +80,58 @@ const PaymentSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["completed", "pending", "failed", "refunded", "processed"],
-      default: "pending",
+      enum: ['completed', 'pending', 'failed', 'refunded', 'processed'],
+      default: 'pending'
     },
     paymentType: {
       type: String,
       enum: ['deposit', 'installment', 'final', 'full'],
       default: 'full'
     },
-    installmentNumber: { 
+    installmentNumber: {
       type: Number,
-      default: 0 
+      default: 0
     },
-    transactionDetails: { 
-      type: Object 
+    transactionDetails: {
+      type: Object
     },
-    isPartial: { 
-      type: Boolean, 
-      default: false 
+    isPartial: {
+      type: Boolean,
+      default: false
     },
-    customerRequest: { 
-      type: String 
+    customerRequest: {
+      type: String
     },
-    customerResponse: { 
+    customerResponse: {
       type: mongoose.Schema.Types.Mixed,
       default: {}
     },
-    payId: { 
-      type: String, 
-      required: true 
+    payId: {
+      type: String,
+      required: true
     },
     razorpayOrderId: String,
     razorpayPaymentId: String,
     razorpaySignature: String,
-    recordedBy: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'User' 
+    recordedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
     },
-    completedAt: { 
-      type: Date 
+    completedAt: {
+      type: Date
     },
-    failedAt: { 
-      type: Date 
+    failedAt: {
+      type: Date
     },
-    refundedAt: { 
-      type: Date 
+    refundedAt: {
+      type: Date
     },
-    notes: { 
-      type: String 
+    notes: {
+      type: String
     }
   },
-  { 
-    timestamps: { updatedAt: "updatedAt" },
+  {
+    timestamps: { updatedAt: 'updatedAt' },
     toJSON: {
       virtuals: true,
       transform: function(doc, ret) {
@@ -146,14 +146,14 @@ const PaymentSchema = new mongoose.Schema(
 
 const RefundSchema = new mongoose.Schema(
   {
-    paymentId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Payment", 
-      required: true 
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Payment',
+      required: true
     },
-    amountRefunded: { 
-      type: Number, 
-      required: true 
+    amountRefunded: {
+      type: Number,
+      required: true
     },
     currency: {
       type: String,
@@ -161,24 +161,24 @@ const RefundSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["refunded", "pending", "failed"],
-      default: "pending",
+      enum: ['refunded', 'pending', 'failed'],
+      default: 'pending'
     },
     refundReason: String,
     processedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
-    refundedAt: { 
-      type: Date 
+    refundedAt: {
+      type: Date
     },
     transactionDetails: {
       type: Object
     },
     notes: String
   },
-  { 
-    timestamps: { createdAt: "createdAt" },
+  {
+    timestamps: { createdAt: 'createdAt' },
     toJSON: {
       virtuals: true,
       transform: function(doc, ret) {
@@ -194,17 +194,17 @@ const RefundSchema = new mongoose.Schema(
 // Add auto-increment plugins if models don't exist
 if (!mongoose.models.ModeOfPayment) {
   ModeOfPaymentSchema.plugin(AutoIncrement, {
-    id: "mode_of_payment_seq",
-    inc_field: "order",
-    start_seq: 1000,
+    id: 'mode_of_payment_seq',
+    inc_field: 'order',
+    start_seq: 1000
   });
 }
 
 if (!mongoose.models.Payment) {
   PaymentSchema.plugin(AutoIncrement, {
-    id: "payment_seq",
-    inc_field: "order",
-    start_seq: 5000,
+    id: 'payment_seq',
+    inc_field: 'order',
+    start_seq: 5000
   });
 }
 
@@ -227,8 +227,8 @@ PaymentSchema.virtual('amountInRupees').get(function() {
   return this.currency === 'INR' ? this.amount : null;
 });
 
-const ModeOfPayment = mongoose.models.ModeOfPayment || mongoose.model("ModeOfPayment", ModeOfPaymentSchema);
-const Payment = mongoose.models.Payment || mongoose.model("Payment", PaymentSchema);
-const Refund = mongoose.models.Refund || mongoose.model("Refund", RefundSchema);
+const ModeOfPayment = mongoose.models.ModeOfPayment || mongoose.model('ModeOfPayment', ModeOfPaymentSchema);
+const Payment = mongoose.models.Payment || mongoose.model('Payment', PaymentSchema);
+const Refund = mongoose.models.Refund || mongoose.model('Refund', RefundSchema);
 
-export { ModeOfPayment, Payment, Refund };
+module.exports = { ModeOfPayment, Payment, Refund };
