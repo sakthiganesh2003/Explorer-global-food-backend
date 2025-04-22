@@ -179,7 +179,7 @@ const createRazorpayOrder = async (req, res) => {
       currency,
       paymentStatus: 'pending',
       paymentType,
-      payId: `razorpay_${uuidv4().slice(0, 32)}`,
+      Id: `pay_${uuidv4().slice(0, 32)}`,
       installmentNumber,
       razorpayOrderId: order.id,
       transactionDetails: {
@@ -206,28 +206,69 @@ const createRazorpayOrder = async (req, res) => {
   }
 };
 
-// Verify Payment
+const verifyPaymentStatusWithRazorpay = async (paymentId, retries = 3, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const payment = await razorpayInstance.payments.fetch(paymentId);
+      console.log('Razorpay Payment Status:', payment.status, 'Payment ID:', paymentId);
+      return payment.status === 'captured' || payment.status === 'authorized';
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed:`, {
+        message: error.message || error.error?.description || 'Unknown error',
+        status: error.status || error.error?.code || 'Unknown status',
+        errorDetails: error.error?.description || 'No additional details',
+        paymentId,
+      });
+      if (error.error?.description === 'The id provided does not exist') {
+        throw new Error('Payment ID does not exist in Razorpay');
+      }
+      if (i === retries - 1) {
+        throw new Error('Failed to verify payment with Razorpay after retries');
+      }
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+};
+
+const capturePayment = async (paymentId, amount) => {
+  try {
+    const response = await razorpayInstance.payments.capture(paymentId, amount * 100, 'INR');
+    console.log('Payment Captured:', response);
+    return response.status === 'captured';
+  } catch (error) {
+    console.error('Error capturing payment:', error);
+    throw new Error('Failed to capture payment');
+  }
+};
+
 const verifyPayment = async (req, res) => {
   try {
-    console.log('verifyPayment req.body:', JSON.stringify(req.body, null, 2)); // Debug log
+    console.log('Request Headers:', req.headers);
+    console.log('Request Body:', JSON.stringify(req.body, null, 2));
+    console.log('Environment:', process.env.NODE_ENV, 'Razorpay Mode:', process.env.RAZORPAY_KEY_ID.startsWith('rzp_test') ? 'Test' : 'Live');
+    console.log('Razorpay Key ID:', process.env.RAZORPAY_KEY_ID);
+
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
     // Validate input
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      console.error('Missing required fields:', { razorpay_payment_id, razorpay_order_id, razorpay_signature });
       return res.status(400).json({
         success: false,
         message: 'Missing required payment verification fields',
       });
     }
 
-    if (!razorpay_payment_id.startsWith('pay_')) {
+    if (!razorpay_payment_id.match(/^pay_[A-Za-z0-9-]{20,35}$/)) {
+      console.error('Invalid razorpay_payment_id:', razorpay_payment_id);
       return res.status(400).json({
         success: false,
-        message: 'Invalid razorpay_payment_id format. Must start with "pay_"',
+        message: 'Invalid razorpay_payment_id format. Must start with "pay_" and contain 20-35 alphanumeric characters or hyphens',
       });
     }
 
     if (!/^[0-9a-f]{64}$/i.test(razorpay_signature)) {
+      console.error('Invalid razorpay_signature:', razorpay_signature);
       return res.status(400).json({
         success: false,
         message: 'Invalid razorpay_signature format. Must be a 64-character hex string',
@@ -235,9 +276,9 @@ const verifyPayment = async (req, res) => {
     }
 
     // Check payment existence and status
-    console.log('Searching for payment with razorpayOrderId:', razorpay_order_id); // Debug log
+    console.log('Searching for payment with razorpayOrderId:', razorpay_order_id);
     const payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
-    console.log('Found payment:', payment); // Debug log
+    console.log('Found payment:', payment);
     if (!payment) {
       return res.status(404).json({
         success: false,
@@ -245,7 +286,15 @@ const verifyPayment = async (req, res) => {
       });
     }
 
+    // Verify with Razorpay even if marked as completed
     if (payment.paymentStatus === 'completed') {
+      const isValid = await verifyPaymentStatusWithRazorpay(payment.razorpayPaymentId);
+      if (!isValid) {
+        return res.status(400).json({
+          success: false,
+          message: 'Payment marked as completed but not valid on Razorpay',
+        });
+      }
       return res.status(200).json({
         success: true,
         message: 'Payment already verified',
@@ -275,8 +324,8 @@ const verifyPayment = async (req, res) => {
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
-    console.log('Generated Signature:', generatedSignature); // Debug log
-    console.log('Provided Signature:', razorpay_signature); // Debug log
+    console.log('Generated Signature:', generatedSignature);
+    console.log('Provided Signature:', razorpay_signature);
 
     if (generatedSignature !== razorpay_signature) {
       await Payment.findOneAndUpdate(
@@ -288,6 +337,42 @@ const verifyPayment = async (req, res) => {
         success: false,
         message: 'Invalid payment signature',
       });
+    }
+
+    // Verify payment status with Razorpay
+    try {
+      const isPaymentValid = await verifyPaymentStatusWithRazorpay(razorpay_payment_id);
+      if (!isPaymentValid) {
+        await Payment.findOneAndUpdate(
+          { razorpayOrderId: razorpay_order_id },
+          { paymentStatus: 'failed' },
+          { new: true }
+        );
+        return res.status(400).json({
+          success: false,
+          message: 'Payment not captured or authorized on Razorpay',
+        });
+      }
+    } catch (error) {
+      if (error.message === 'Payment ID does not exist in Razorpay') {
+        console.error('Payment ID not found:', { razorpay_payment_id, razorpay_order_id });
+        await Payment.findOneAndUpdate(
+          { razorpayOrderId: razorpay_order_id },
+          { paymentStatus: 'failed' },
+          { new: true }
+        );
+        return res.status(400).json({
+          success: false,
+          message: 'Payment ID does not exist in Razorpay',
+        });
+      }
+      throw error;
+    }
+
+    // Capture payment if authorized
+    const razorpayPayment = await razorpayInstance.payments.fetch(razorpay_payment_id);
+    if (razorpayPayment.status === 'authorized') {
+      await capturePayment(razorpay_payment_id, payment.amount);
     }
 
     // Start MongoDB transaction
@@ -302,7 +387,7 @@ const verifyPayment = async (req, res) => {
             razorpaySignature: razorpay_signature,
             paymentStatus: 'completed',
             completedAt: new Date(),
-            payId: razorpay_payment_id, // Set payId during verification
+            payId: razorpay_payment_id,
           },
           { new: true, session }
         );
@@ -316,7 +401,6 @@ const verifyPayment = async (req, res) => {
         if (updatedPayment.paymentType === 'full') {
           booking.paymentStatus = 'completed';
         } else if (updatedPayment.paymentType === 'partial') {
-          // Check if all installments are paid
           const totalPaid = await Payment.aggregate([
             { $match: { bookingId: updatedPayment.bookingId, paymentStatus: 'completed' } },
             { $group: { _id: null, total: { $sum: '$amount' } } },
@@ -366,7 +450,6 @@ const verifyPayment = async (req, res) => {
     });
   }
 };
-
 // Record Manual Payment
 const recordManualPayment = async (req, res) => {
   try {
