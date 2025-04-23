@@ -22,7 +22,7 @@ const foodRoutes = require('./Routes/foodRoutes');
 const bookingRoutes = require('./Routes/booking/bookingroutes');
 
 // payments
-const paymentRoutes = require('./Routes/payments/paymentroutes.js');
+const paymentRoutes = require('./Routes/payments/paymentroutes');
 
 // const modeofpaymentRoutes = require('./Routes/payments/');
 
@@ -52,7 +52,7 @@ app.use('/api/foods', foodRoutes);
 // app.use('/api/booking', bookingRoutes);
 // app.use('/api/maids', selectMaidRouter);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/payments', paymentRoutes);
+app.use('/api/payments', paymentRoutes );
 // app.use('/api/modeofpayment', modeofpaymentRoutes);
 
 

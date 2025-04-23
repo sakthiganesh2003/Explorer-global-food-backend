@@ -1,29 +1,15 @@
 const express = require('express');
 const {
-  createPaymentMethod,
-  createRazorpayOrder,
-  verifyPayment,
-  recordManualPayment,
-  processRefund,
-  getPaymentsByBooking
-} = require('../../Controller/payment/paymentcontroller.js');
+  initiatePayment,
+  verifyPayment
+} = require('../../Controller/payment/paymentcontroller');
 
 const router = express.Router();
 
-// Payment methods
-router.post('/methods', createPaymentMethod);
+// Initialize payment
+router.post('/initiate', initiatePayment); // Line 10: Error here
 
-// Razorpay payments
-router.post('/razorpay/create-order', createRazorpayOrder);
-router.post('/razorpay/verify', verifyPayment);
-
-// Manual payments
-router.post('/manual', recordManualPayment);
-
-// Refunds
-router.post('/refunds', processRefund);
-
-// Get payments
-router.get('/booking/:bookingId', getPaymentsByBooking);
+// Verify payment (webhook or frontend callback)
+router.post('/verify', verifyPayment);
 
 module.exports = router;
