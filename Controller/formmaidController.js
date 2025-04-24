@@ -1,13 +1,22 @@
 const Maid = require('../Models/formmaid');
-const multer = require('multer'); 
-const fs = require('fs');
-const path = require('path');
+const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const express = require('express');
-const formmaid = require('../Models/formmaid');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const path = require('path');
+
+// Load .env file explicitly
+dotenv.config({ path: path.resolve(__dirname, '../env') });
 const app = express();
-// Multer setup - Use diskStorage to save files and get a path
-// Configure Cloudinary
+
+// Debug environment variables
+console.log('Environment Variables:', {
+  CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+});
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -17,7 +26,15 @@ cloudinary.config({
 
 // Multer setup with memory storage
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
+// Example usage of 'upload' middleware in a route
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.status(200).json({ success: true, message: 'File uploaded successfully', file: req.file });
+});
 
 // Middleware
 app.use(express.json());
@@ -26,7 +43,7 @@ app.use(express.urlencoded({ extended: true }));
 // Validation helper
 const validateInputs = (data) => {
   const errors = [];
-  
+
   if (!data.userId) errors.push('User ID is required');
   if (!data.fullName?.trim()) errors.push('Full name is required');
   if (!data.email?.trim()) errors.push('Email is required');
@@ -48,7 +65,7 @@ const validateInputs = (data) => {
   if (data.aadhaarNumber && !/^\d{12}$/.test(data.aadhaarNumber)) errors.push('Aadhaar number must be 12 digits');
   if (data.bankDetails?.accountNumber && !/^\d{9,18}$/.test(data.bankDetails.accountNumber)) errors.push('Invalid bank account number');
   if (data.bankDetails?.ifscCode && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(data.bankDetails.ifscCode)) errors.push('Invalid IFSC code format');
-  
+
   return errors;
 };
 
@@ -58,6 +75,14 @@ const addformMaid = async (req, res) => {
   console.log('Uploaded file:', req.file);
 
   try {
+    // Validate Cloudinary configuration
+    if (!process.env.CLOUDINARY_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: 'Cloudinary configuration is missing. Ensure CLOUDINARY_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET are set in .env'
+      });
+    }
+
     // Process specialties
     let specialties = [];
     if (typeof req.body.specialties === 'string') {
@@ -68,6 +93,11 @@ const addformMaid = async (req, res) => {
       }
     } else if (Array.isArray(req.body.specialties)) {
       specialties = req.body.specialties;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Specialties must be a valid JSON array or comma-separated string'
+      });
     }
 
     // Normalize experience
@@ -76,25 +106,51 @@ const addformMaid = async (req, res) => {
       experience = `${experience} years`;
     }
 
-    // Upload aadhaarPhoto to Cloudinary if file exists
+    // Upload aadhaarPhoto to Cloudinary
     let aadhaarPhotoUrl = null;
-    if (req.file) {
-      const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { resource_type: 'image', folder: 'maid_aadhaar' },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-        stream.end(req.file.buffer);
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({
+        success: false,
+        message: 'Aadhaar photo is required and must be a valid file'
       });
-      aadhaarPhotoUrl = result.secure_url;
-      console.log('Cloudinary upload result:', aadhaarPhotoUrl);
     }
 
-    // Extract bank details
-    const bankDetails = req.body.bankDetails || {};
+    try {
+      const result = await cloudinary.uploader.upload_stream(
+        { resource_type: 'image', folder: 'maid_aadhaar' },
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary upload error:', error);
+            throw new Error('Cloudinary upload failed');
+          }
+          aadhaarPhotoUrl = result.secure_url;
+        }
+      );
+      const stream = require('stream').Readable.from(req.file.buffer);
+      stream.pipe(result);
+      console.log('Cloudinary upload result:', aadhaarPhotoUrl);
+    } catch (uploadError) {
+      console.error('Cloudinary upload failed:', uploadError);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload Aadhaar photo to Cloudinary',
+        error: process.env.NODE_ENV === 'development' ? uploadError.message : undefined
+      });
+    }
+
+    // Parse bank details
+    let bankDetails = req.body.bankDetails;
+    if (typeof bankDetails === 'string') {
+      try {
+        bankDetails = JSON.parse(bankDetails);
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid bank details format'
+        });
+      }
+    }
+
     const maidData = {
       userId: req.body.userId,
       fullName: req.body.fullName,
@@ -104,37 +160,35 @@ const addformMaid = async (req, res) => {
       specialties: specialties,
       bio: req.body.bio,
       aadhaarNumber: req.body.aadhaarNumber,
-      aadhaarPhoto: aadhaarPhotoUrl,
       bankDetails: {
         accountNumber: bankDetails.accountNumber,
         bankName: bankDetails.bankName,
         ifscCode: bankDetails.ifscCode,
         accountHolderName: bankDetails.accountHolderName
       },
-      image: aadhaarPhotoUrl, // Use aadhaarPhoto as image (adjust if separate)
-      rating: 0 // Default rating
+      rating: 0,
+      aadhaarPhoto: aadhaarPhotoUrl,
+      image: aadhaarPhotoUrl
     };
 
     // Validate data
     const validationErrors = validateInputs(maidData);
-    console.log('Validation errors:', validationErrors);
     if (validationErrors.length > 0) {
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: 'Validation failed',
-        errors: validationErrors 
+        errors: validationErrors
       });
     }
 
-     // Adjust path as needed
-    const existingMaid = await formmaid.findOne({
+    // Check for existing maid
+    const existingMaid = await Maid.findOne({
       $or: [
         { email: maidData.email.toLowerCase() },
         { phone: maidData.phone },
         { aadhaarNumber: maidData.aadhaarNumber }
       ]
     });
-    console.log('Existing maid:', existingMaid ? existingMaid._id : 'None');
 
     if (existingMaid) {
       return res.status(409).json({
@@ -158,7 +212,6 @@ const addformMaid = async (req, res) => {
         status: savedMaid.status
       }
     });
-
   } catch (error) {
     console.error('Error submitting maid application:', error);
     res.status(500).json({
@@ -168,16 +221,17 @@ const addformMaid = async (req, res) => {
     });
   }
 };
+// Controller: getformMaids
 const getformMaids = async (req, res) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;
     const query = {};
-    
+
     if (status) query.status = status;
-    
+
     const maids = await Maid.find(query)
       .select('-__v -bankDetails')
-      .sort({ createdAt: -1 }) // Changed from registrationDate to createdAt
+      .sort({ createdAt: -1 })
       .limit(Number(limit))
       .skip((Number(page) - 1) * Number(limit))
       .lean();
@@ -201,8 +255,7 @@ const getformMaids = async (req, res) => {
   }
 };
 
-const mongoose = require('mongoose');
-
+// Controller: updateStatusMaid
 const updateStatusMaid = async (req, res) => {
   try {
     const { id } = req.params;
@@ -210,15 +263,15 @@ const updateStatusMaid = async (req, res) => {
 
     // Validate input
     if (!id || !status) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'ID and status are required' 
+        message: 'ID and status are required'
       });
     }
 
     const validStatuses = ['pending', 'approved', 'rejected', 'active', 'inactive'];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
         message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
       });
@@ -226,71 +279,104 @@ const updateStatusMaid = async (req, res) => {
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid maid ID format' 
+        message: 'Invalid maid ID format'
       });
     }
 
-    // Update the formmaid record
-    const updatedFormMaid = await FormMaid.findByIdAndUpdate(
+    // Update the maid application record
+    const updatedMaid = await Maid.findByIdAndUpdate(
       id,
       { status },
       { new: true, runValidators: true }
     ).select('-__v');
 
-    if (!updatedFormMaid) {
-      return res.status(404).json({ 
+    if (!updatedMaid) {
+      return res.status(404).json({
         success: false,
-        message: 'Maid application not found' 
+        message: 'Maid application not found'
       });
     }
 
-    // If status is 'approved', create a new record in the maid collection
+    // If status is 'approved', create a new maid record
     if (status === 'approved') {
-      const maidData = {
-        userId: updatedFormMaid.userId,
-        fullName: updatedFormMaid.fullName,
-        email: updatedFormMaid.email,
-        phone: updatedFormMaid.phone,
-        experience: updatedFormMaid.experience,
-        specialties: updatedFormMaid.specialties,
-        bio: updatedFormMaid.bio,
-        aadhaarNumber: updatedFormMaid.aadhaarNumber,
-        aadhaarPhoto: updatedFormMaid.aadhaarPhoto,
-        bankDetails: updatedFormMaid.bankDetails,
-        image: updatedFormMaid.image || updatedFormMaid.aadhaarPhoto, // Fallback to aadhaarPhoto
-        rating: updatedFormMaid.rating || 0, // Default if not present
-        status: 'active', // Initial status for new maid record
-        createdAt: new Date()
-      };
+      try {
+        // Ensure specialties is an array
+        const specialties = Array.isArray(updatedMaid.specialties)
+          ? updatedMaid.specialties
+          : [updatedMaid.specialties || 'General'];
 
-      // Check if maid already exists in the maid collection
-      const existingMaid = await Maid.findOne({
-        $or: [
-          { email: maidData.email.toLowerCase() },
-          { phone: maidData.phone },
-          { aadhaarNumber: maidData.aadhaarNumber }
-        ]
-      });
+        // Normalize experience
+        const experienceValue = updatedMaid.experience
+          ? updatedMaid.experience.replace(' years', '')
+          : '0-1';
 
-      if (existingMaid) {
-        return res.status(409).json({
+        // Validate userId as ObjectId
+        if (!mongoose.Types.ObjectId.isValid(updatedMaid.userId)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid userId format: Must be a valid ObjectId'
+          });
+        }
+
+        // Check if maid already exists
+        const existingMaid = await Maid.findOne({
+          $or: [
+            { email: updatedMaid.email.toLowerCase() },
+            { phone: updatedMaid.phone },
+            { aadhaarNumber: updatedMaid.aadhaarNumber }
+          ],
+          _id: { $ne: id } // Exclude the current maid
+        });
+
+        if (existingMaid) {
+          return res.status(409).json({
+            success: false,
+            message: 'Maid with this email, phone, or Aadhaar number already exists'
+          });
+        }
+
+        const newMaid = new Maid({
+          userId: updatedMaid.userId,
+          fullName: updatedMaid.fullName,
+          email: updatedMaid.email,
+          phone: updatedMaid.phone,
+          experience: experienceValue,
+          specialties: specialties,
+          bio: updatedMaid.bio,
+          aadhaarNumber: updatedMaid.aadhaarNumber,
+          aadhaarPhoto: updatedMaid.aadhaarPhoto,
+          bankDetails: updatedMaid.bankDetails,
+          image: updatedMaid.image || updatedMaid.aadhaarPhoto || 'default.jpg',
+          rating: updatedMaid.rating || 0,
+          status: 'active',
+          createdAt: new Date()
+        });
+
+        console.log('New Maid:', newMaid);
+        const savedMaid = await newMaid.save();
+        console.log('New maid created:', savedMaid._id);
+
+        return res.status(200).json({
+          success: true,
+          message: 'Maid status updated successfully and new maid record created',
+          data: updatedMaid,
+          maid: savedMaid
+        });
+      } catch (saveError) {
+        console.error('Error creating Maid:', saveError);
+        return res.status(500).json({
           success: false,
-          message: 'Approved maid with this email, phone, or Aadhaar number already exists'
+          message: 'Error creating Maid: ' + saveError.message
         });
       }
-
-      // Create new maid record
-      const newMaid = new Maid(maidData);
-      const savedMaid = await newMaid.save();
-      console.log('New maid created:', savedMaid._id);
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Maid status updated successfully' + (status === 'approved' ? ' and new maid record created' : ''),
-      data: updatedFormMaid
+      message: 'Maid status updated successfully',
+      data: updatedMaid
     });
   } catch (error) {
     console.error('Error updating maid status:', error);
@@ -302,24 +388,24 @@ const updateStatusMaid = async (req, res) => {
   }
 };
 
-module.exports = { updateStatusMaid };
+// Controller: deleteMaid
 const deleteMaid = async (req, res) => {
   try {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Maid ID is required' 
+        message: 'Maid ID is required'
       });
     }
 
     const deletedMaid = await Maid.findByIdAndDelete(id);
 
     if (!deletedMaid) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'Maid not found' 
+        message: 'Maid not found'
       });
     }
 
@@ -342,23 +428,24 @@ const deleteMaid = async (req, res) => {
   }
 };
 
+// Controller: deleteMaids
 const deleteMaids = async (req, res) => {
   try {
     const { ids } = req.body;
 
     if (!ids || !Array.isArray(ids)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Array of maid IDs is required' 
+        message: 'Array of maid IDs is required'
       });
     }
 
     const deleteResult = await Maid.deleteMany({ _id: { $in: ids } });
 
     if (deleteResult.deletedCount === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'No maids found to delete' 
+        message: 'No maids found to delete'
       });
     }
 
@@ -376,11 +463,10 @@ const deleteMaids = async (req, res) => {
   }
 };
 
-
-module.exports = { 
-  addformMaid, 
+module.exports = {
+  addformMaid,
   getformMaids,
   updateStatusMaid,
   deleteMaid,
-  deleteMaids 
+  deleteMaids
 };

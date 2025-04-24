@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -26,6 +27,9 @@ const paymentRoutes = require('./Routes/payments/paymentroutes');
 
 // const modeofpaymentRoutes = require('./Routes/payments/');
 
+// Increase payload size limit 50MB 
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Middleware
 app.use(express.json());
