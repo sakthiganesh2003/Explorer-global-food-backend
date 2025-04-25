@@ -1,9 +1,24 @@
 const mongoose = require("mongoose");
 
 const maidSchema = new mongoose.Schema({
+  MaidId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    required: [true, 'MaidId is required'], 
+    default: () => new mongoose.Types.ObjectId() // Auto-generate ObjectId
+  },
   fullName: { type: String, required: true },
-  userId:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
-  specialties: { type: [String], required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  specialties: { 
+    type: [String], 
+    required: true,
+    validate: {
+      validator: function (array) {
+        const validCuisines = ['Italian', 'Mexican', 'Chinese', 'Indian', 'French', 'General'];
+        return array.every(cuisine => validCuisines.includes(cuisine));
+      },
+      message: 'Invalid cuisine. Choose from: Italian, Mexican, Chinese, Indian, French, General'
+    }
+  },
   rating: { type: Number, required: true },
   experience: {
     type: String,
@@ -14,19 +29,9 @@ const maidSchema = new mongoose.Schema({
     }
   },
   image: { type: String, required: true },
-  active: {
-    type: Boolean,
-    default: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  }
+  active: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
 const Maid = mongoose.model("Maid", maidSchema);
-
 module.exports = Maid;
-
-// select cuisine
-

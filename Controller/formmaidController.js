@@ -1,13 +1,14 @@
 const Maid = require('../Models/formmaid');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('cloudinary').v2; // Use v2 explicitly
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
+const { timeout } = require('promise-timeout');
 
 // Load .env file explicitly
-dotenv.config({ path: path.resolve(__dirname, '../env') });
+dotenv.config();
 const app = express();
 
 // Debug environment variables
@@ -29,11 +30,6 @@ const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
-});
-
-// Example usage of 'upload' middleware in a route
-app.post('/upload', upload.single('file'), (req, res) => {
-  res.status(200).json({ success: true, message: 'File uploaded successfully', file: req.file });
 });
 
 // Middleware
@@ -83,6 +79,14 @@ const addformMaid = async (req, res) => {
       });
     }
 
+    // Log Cloudinary configuration
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+    console.log('Cloudinary Config:', cloudinary.config());
+
     // Process specialties
     let specialties = [];
     if (typeof req.body.specialties === 'string') {
@@ -115,19 +119,25 @@ const addformMaid = async (req, res) => {
       });
     }
 
-    try {
-      const result = await cloudinary.uploader.upload_stream(
-        { resource_type: 'image', folder: 'maid_aadhaar' },
-        (error, result) => {
-          if (error) {
-            console.error('Cloudinary upload error:', error);
-            throw new Error('Cloudinary upload failed');
+    const uploadToCloudinary = (buffer) => {
+      return new Promise((resolve, reject) => {
+        const base64Image = buffer.toString('base64');
+        cloudinary.uploader.upload(
+          `data:image/png;base64,${base64Image}`,
+          { resource_type: 'image', folder: 'maid_aadhaar' },
+          (error, result) => {
+            if (error) {
+              console.error('Cloudinary API Error:', error);
+              return reject(error);
+            }
+            resolve(result.secure_url);
           }
-          aadhaarPhotoUrl = result.secure_url;
-        }
-      );
-      const stream = require('stream').Readable.from(req.file.buffer);
-      stream.pipe(result);
+        );
+      });
+    };
+
+    try {
+      aadhaarPhotoUrl = await timeout(uploadToCloudinary(req.file.buffer), 30000); // 30-second timeout
       console.log('Cloudinary upload result:', aadhaarPhotoUrl);
     } catch (uploadError) {
       console.error('Cloudinary upload failed:', uploadError);
@@ -221,6 +231,7 @@ const addformMaid = async (req, res) => {
     });
   }
 };
+
 // Controller: getformMaids
 const getformMaids = async (req, res) => {
   try {
