@@ -13,9 +13,12 @@ const {
     uploadGovernmentIdAndBecomeInstructor,
     
     signupMaid,
+    signupChef,
     maidLogin,
+    chefLogin,
     
-    verifyMaidEmail
+    verifyMaidEmail,
+    verifyChefEmail,
 } = require("../Controller/Authcontroller");
 const Guide = require("../Models/instructor");
 
@@ -39,13 +42,22 @@ const upload = multer({
 // Routes
 router.post("/signup", signup);
 router.post("/login", login);
+
 router.post("/maid/signup", signupMaid);
+router.post("/chef/signup", signupChef);
+
 router.post("/maid/login", maidLogin);
+router.post("/chef/login", chefLogin);
+
 router.post("/resendverification", resendVerificationEmail);
 router.get("/verify-email/:token", verifyEmail);
 // Use multer middleware for file upload
 router.post("/verifyId", upload.single("governmentId"), uploadGovernmentIdAndBecomeInstructor);
+
 router.get("/verify-maid-email/:token", verifyMaidEmail);
+router.get("/verify-chef-email/:token", verifyChefEmail);   
+
+
 router.post("/forgot-password", forgotPassword);
 router.post("/verify-reset-code", verifyResetCode);
 router.post("/reset-password", resetPassword);

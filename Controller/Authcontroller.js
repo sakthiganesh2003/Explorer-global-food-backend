@@ -220,7 +220,7 @@ const signup = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
-
+// maid signup
 const signupMaid = async (req, res) => {
     try {
         console.log("✅ Received maid Data:", req.body);
@@ -284,6 +284,70 @@ const signupMaid = async (req, res) => {
     }
 };
 
+
+//chef signup
+const signupChef = async (req, res) => {
+    try {
+        console.log("✅ Received Chef Data:", req.body);
+        const { name, email, password } = req.body;
+
+        if (!name || !email) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        // Check if email or name already exists
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) return res.status(400).json({ message: "User with this email already exists" });
+
+        const existingName = await User.findOne({ name });
+        if (existingName) return res.status(400).json({ 
+            info: "This name is already taken. Please choose a different name.",
+            isNameTaken: true 
+        });
+
+        // Hash the password and create a verification token
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+
+        // Create new Chef user
+        const newChef = new User({
+            name,
+            email,
+            password: hashedPassword,
+            isVerified: false,
+            verificationToken,
+            role: "chef", // Assigning chef role
+        });
+
+        await newChef.save();
+
+        // Generate a JWT token
+        const token = jwt.sign(
+            { id: newChef._id, name: newChef.name, email: newChef.email, role: newChef.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        res.status(201).json({
+            message: "Chef registered successfully. Please verify your email and wait for admin approval.",
+            token,
+            user: { id: newChef._id, name: newChef.name, role: newChef.role }
+        });
+
+        // Send verification email
+        const verificationUrl = `${process.env.FRONTEND_URL}/chef/chef-verify/${verificationToken}`;
+        await transporter.sendMail({
+            from: `global food explore <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Verify Your Email - global food explore",
+            html: emailVerificationTemplate(verificationUrl),
+        });
+
+    } catch (error) {
+        console.error("❌ Signup Chef Error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 const resendVerificationEmail = async (req, res) => {
     try {
         const { email } = req.body;
@@ -413,6 +477,50 @@ const maidLogin = async (req, res) => {
     }
 };
 
+const chefLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: "Please enter a valid email and password" });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        // Check if the role is 'chef'
+        if (user.role !== 'chef') {
+            return res.status(403).json({ error: "Access denied. Only chefs can log in from this route." });
+        }
+
+        if (!user.isVerified) {
+            return res.status(401).json({ error: "Please verify your email before logging in" });
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        const token = jwt.sign(
+            { id: user._id.toString(), name: user.name, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        res.status(200).json({
+            message: "Chef login successful",
+            user: { _id: user._id, name: user.name, role: user.role },
+            token,
+        });
+    } catch (error) {
+        console.error("❌ Chef Login error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 const verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
@@ -440,7 +548,7 @@ const verifyEmail = async (req, res) => {
         });
     }
 };
-
+// maid email verification
 const verifyMaidEmail = async (req, res) => {
     try {
         const { token } = req.params;
@@ -488,6 +596,59 @@ const verifyMaidEmail = async (req, res) => {
         console.error("❌ Instructor Email Verification Error:", error);
         res.status(500).json({ 
             message: "Server error during guide verification",
+            code: "SERVER_ERROR",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+//chef email verification
+const verifyChefEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+        
+        // 1. Find chef by verification token
+        const chef = await User.findOne({ 
+            verificationToken: token,
+            role: 'chef' // Ensure we're verifying a chef account
+        });
+        
+        if (!chef) {
+            return res.status(400).json({ 
+                message: "Invalid or expired token",
+                code: "INVALID_TOKEN"
+            });
+        }
+
+        // 2. Check if chef is already verified
+        if (chef.isVerified) {
+            return res.status(200).json({ 
+                message: "Chef email already verified",
+                code: "ALREADY_VERIFIED",
+                redirectUrl: chef.govIdVerified ? "/chef/dashboard" : "/chef/upload-id"
+            });
+        }
+
+        // 3. Update verification status
+        chef.isVerified = true;
+        chef.verificationToken = null;
+        chef.verificationDate = new Date();
+        
+        await chef.save();
+
+        // 4. Check if government ID needs to be uploaded
+        const requiresIdUpload = !chef.govIdVerified && !chef.govIdPath;
+
+        res.status(200).json({
+            message: "Chef email verified successfully!",
+            code: "VERIFICATION_SUCCESS",
+            requiresIdUpload,
+            redirectUrl: requiresIdUpload ? "/chef/upload-id" : "/chef/dashboard"
+        });
+
+    } catch (error) {
+        console.error("❌ Chef Email Verification Error:", error);
+        res.status(500).json({ 
+            message: "Server error during chef verification",
             code: "SERVER_ERROR",
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
@@ -574,5 +735,8 @@ module.exports = {
     forgotPassword,
     resetPassword,
     verifyResetCode,
-    upload // Exporting multer middleware if needed elsewhere
+    upload,// Exporting multer middleware if needed elsewhere
+    signupChef,
+    chefLogin,
+    verifyChefEmail,
 };

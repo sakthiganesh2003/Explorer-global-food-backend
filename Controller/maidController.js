@@ -7,10 +7,17 @@ const { updateStatusMaid } = require("./formmaidController");
 const getMaids = async (req, res) => {
   try {
     const maids = await Maid.find();
-    res.status(200).json(maids);
+    // Map maids to ensure userId is always present
+    const formattedMaids = maids.map((maid) => ({
+      ...maid.toObject(),
+      userId: maid.userId || maid._id.toString(), // Fallback to _id if userId is missing
+      fullName: maid.fullName || maid.name || 'Unknown', // Handle name/fullName
+    }));
+    console.log('Fetched maids:', formattedMaids);
+    res.status(200).json(formattedMaids);
   } catch (error) {
-    console.error("Error fetching maids:", error);
-    res.status(500).json({ message: "Error fetching maids", error: error.message });
+    console.error('Error fetching maids:', error);
+    res.status(500).json({ message: 'Error fetching maids', error: error.message });
   }
 };
 
@@ -136,8 +143,24 @@ const toggleMaidStatus = async (req, res) => {
 
 };
 
+const getMaidById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const maid = await Maid.findById(id); // Fetch maid by ID from the database     
+    if (!maid) {
+      return res.status(404).json({ message: "Maid not found" });
+    }
+    res.status(200).json(maid); // Return the maid details
+  }
+  catch (error) {
+    console.error("Error fetching maid by ID:", error);
+    res.status(500).json({ message: "Error fetching maid", error: error.message });
+  }
+};
+
 module.exports = {
   getMaids,
+  getMaidById,
   addMaid,
   getCuisines,
   addCuisine,

@@ -1,11 +1,7 @@
 const mongoose = require("mongoose");
 
 const maidSchema = new mongoose.Schema({
-  MaidId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    required: [true, 'MaidId is required'], 
-    default: () => new mongoose.Types.ObjectId() // Auto-generate ObjectId
-  },
+
   fullName: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   specialties: { 

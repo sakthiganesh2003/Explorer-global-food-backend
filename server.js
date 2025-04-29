@@ -21,9 +21,13 @@ const foodRoutes = require('./Routes/foodRoutes');
 
 //booking
 const bookingRoutes = require('./Routes/booking/bookingroutes');
+const bookingidroutes = require('./Routes/booking/bookingidroutes');
 
 // payments
 const paymentRoutes = require('./Routes/payments/paymentroutes');
+
+//chef
+const chefRoutes = require('./Routes/chef/chefformroutes');
 
 // const modeofpaymentRoutes = require('./Routes/payments/');
 
@@ -58,7 +62,11 @@ app.use('/api/foods', foodRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes );
 // app.use('/api/modeofpayment', modeofpaymentRoutes);
+app.use('/api/book', bookingidroutes );
 
+
+//chef routes
+app.use('/api/chefs', chefRoutes);
 
   // Make sure this matches the controller
 

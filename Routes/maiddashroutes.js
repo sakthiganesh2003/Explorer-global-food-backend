@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const maiddashController = require('../Controller/maiddashController');
-const auth = require('../middleware/auth'); // Make sure this path is correct
+// const auth = require('../middleware/auth'); // Make sure this path is correct
 
 // @route   GET api/maid-dashboard/profile
 // @desc    Get maid profile

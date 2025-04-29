@@ -9,122 +9,124 @@ const mongoose = require('mongoose');
 exports.createBooking = async (req, res) => {
   console.log('Booking request body:', req.body);
   try {
-    if (!req.body.userId || !req.body.maid || !req.body.time || !req.body.time.date || !req.body.time.time) {
+    // Validate required fields
+    if (!req.body.userId || !req.body.maidId || !req.body.time || !req.body.time.date || !req.body.time.time) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: userId, maid, or time details'
+        message: 'Missing required fields: userId, maidId, or time details',
       });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(req.body.maid)) {
+    // Validate userId and maidId format
+    if (!mongoose.Types.ObjectId.isValid(req.body.userId)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid maid ID format'
+        message: 'Invalid user ID format',
+      });
+    }
+    if (!mongoose.Types.ObjectId.isValid(req.body.maidId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid maid ID format',
       });
     }
 
+    // Validate date
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     const requestedDate = req.body.time.date;
     if (!dateRegex.test(requestedDate) || new Date(requestedDate) < new Date().setHours(0, 0, 0, 0)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or past date'
+        message: 'Invalid or past date',
       });
     }
 
-    if (!req.body.time.time || (typeof req.body.time.time !== 'string' && !Array.isArray(req.body.time.time))) {
+    // Validate time format
+    let requestedTimes = req.body.time.time;
+    if (typeof requestedTimes === 'string') {
+      requestedTimes = [requestedTimes];
+    }
+    if (!Array.isArray(requestedTimes)) {
       return res.status(400).json({
         success: false,
-        message: 'Time must be a string or an array of time slots'
+        message: 'Time must be an array of time slots',
       });
     }
 
+    const timeRegex = /^(\d{1,2}:\d{2}\s?[AP]M)(-\d{1,2}:\d{2}\s?[AP]M)?$/i;
+    if (!requestedTimes.every((time) => timeRegex.test(time))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid time format. Use "HH:MM AM/PM" or "HH:MM AM/PM-HH:MM AM/PM"',
+      });
+    }
+
+    // Validate user
     const user = await User.findById(req.body.userId);
     console.log('User found:', user);
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
-    let maid = await User.findById(req.body.maid);
-    console.log('Maid (User collection):', maid);
-    let maidModel = 'User';
-    if (!maid) {
-      maid = await Maid.findById(req.body.maid);
-      console.log('Maid (Maid collection):', maid);
-      maidModel = 'Maid';
-    }
-
+    // Validate maid (only check User collection)
+    const maid = await User.findById(req.body.maidId);
+    console.log('Maid found:', maid);
     if (!maid) {
       return res.status(404).json({
         success: false,
-        message: 'Maid not found in User or Maid collections'
+        message: 'Maid not found in User collection',
       });
     }
 
-    let requestedTimes = req.body.time.time;
-    if (typeof requestedTimes === 'string') {
-      requestedTimes = [requestedTimes];
-    }
-
-    if (!Array.isArray(requestedTimes)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Time should be an array of time slots'
-      });
-    }
-
-    const timeRegex = /^(\d{1,2}:\d{2}\s?[AP]M)(-\d{1,2}:\d{2}\s?[AP]M)?$/i;
-    if (!requestedTimes.every(time => timeRegex.test(time))) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid time format. Use "HH:MM AM/PM" or "HH:MM AM/PM-HH:MM AM/PM"'
-      });
-    }
-
-    const timeSlots = requestedTimes.map(timeSlot => {
+    // Convert time slots to Date objects
+    const timeSlots = requestedTimes.map((timeSlot) => {
       if (!timeSlot.includes('-')) {
         const startTime = convertTo24HourFormat(timeSlot);
         const start = new Date(`${requestedDate}T${startTime}:00`);
-        const end = new Date(start.getTime() + 60 * 60 * 1000);
+        const end = new Date(start.getTime() + 60 * 60 * 1000); // Default 1-hour duration
         return { start, end };
       }
-      const [startTime, endTime] = timeSlot.split('-').map(t => t.trim());
+      const [startTime, endTime] = timeSlot.split('-').map((t) => t.trim());
       return {
         start: new Date(`${requestedDate}T${convertTo24HourFormat(startTime)}:00`),
-        end: new Date(`${requestedDate}T${convertTo24HourFormat(endTime)}:00`)
+        end: new Date(`${requestedDate}T${convertTo24HourFormat(endTime)}:00`),
       };
     });
 
+    // Check for booking conflicts
     const existingBookings = await Booking.find({
-      maid: req.body.maid,
+      maidId: req.body.maidId,
       'time.date': requestedDate,
-      status: { $ne: 'cancelled' }
+      status: { $ne: 'cancelled' },
     });
     console.log('Existing bookings:', existingBookings);
 
-    const hasConflict = existingBookings.some(existingBooking => {
-      const existingTimes = Array.isArray(existingBooking.time.time) 
-        ? existingBooking.time.time 
+    const hasConflict = existingBookings.some((existingBooking) => {
+      const existingTimes = Array.isArray(existingBooking.time.time)
+        ? existingBooking.time.time
         : [existingBooking.time.time];
-      
-      return existingTimes.some(existingTime => {
+
+      return existingTimes.some((existingTime) => {
         const [existingStart, existingEnd] = existingTime.includes('-')
-          ? existingTime.split('-').map(t => 
-              new Date(`${existingBooking.time.date}T${convertTo24HourFormat(t.trim())}:00`))
+          ? existingTime.split('-').map((t) =>
+              new Date(`${existingBooking.time.date}T${convertTo24HourFormat(t.trim())}:00`)
+            )
           : [
               new Date(`${existingBooking.time.date}T${convertTo24HourFormat(existingTime)}:00`),
-              new Date(new Date(`${existingBooking.time.date}T${convertTo24HourFormat(existingTime)}:00`).getTime() + 60 * 60 * 1000)
+              new Date(
+                new Date(`${existingBooking.time.date}T${convertTo24HourFormat(existingTime)}:00`).getTime() +
+                  60 * 60 * 1000
+              ),
             ];
-        
-        const conflict = timeSlots.some(requestedSlot => {
-          const overlap = isTimeOverlap(
-            requestedSlot.start, requestedSlot.end,
-            existingStart, existingEnd
+
+        const conflict = timeSlots.some((requestedSlot) => {
+          const overlap = isTimeOverlap(requestedSlot.start, requestedSlot.end, existingStart, existingEnd);
+          console.log(
+            `Checking conflict: Requested [${requestedSlot.start.toISOString()} - ${requestedSlot.end.toISOString()}] vs Existing [${existingStart.toISOString()} - ${existingEnd.toISOString()}] -> Overlap: ${overlap}`
           );
-          console.log(`Checking conflict: Requested [${requestedSlot.start.toISOString()} - ${requestedSlot.end.toISOString()}] vs Existing [${existingStart.toISOString()} - ${existingEnd.toISOString()}] -> Overlap: ${overlap}`);
           return overlap;
         });
         return conflict;
@@ -134,44 +136,83 @@ exports.createBooking = async (req, res) => {
     if (hasConflict) {
       return res.status(400).json({
         success: false,
-        message: 'Maid is already booked during the requested time slot(s)'
+        message: 'Maid is already booked during the requested time slot(s)',
       });
     }
 
+    // Prepare booking data
     const bookingData = {
-      ...req.body,
+      userId: req.body.userId,
+      maidId: req.body.maidId,
+      cuisine: req.body.cuisine || { id: '', name: '', price: 0 },
+      members: req.body.members || [],
+      time: req.body.time,
+      confirmedFoods: req.body.confirmedFoods || [],
       status: 'pending',
-      totalAmount: calculateTotalAmount(req.body)
+      totalAmount: calculateTotalAmount(req.body),
     };
 
+    // Save booking
     const newBooking = new Booking(bookingData);
     const savedBooking = await newBooking.save();
     console.log('Saved booking:', savedBooking);
 
+    // Populate booking
     const populatedBooking = await Booking.findById(savedBooking._id)
       .populate('userId', 'name email')
-      .populate({
-        path: 'maid',
-        select: 'name email',
-        model: maidModel
-      });
+      .populate('maidId', 'name email'); // Populate maidId from User collection
     console.log('Populated booking:', populatedBooking);
 
     res.status(201).json({
       success: true,
       data: populatedBooking,
-      message: 'Booking created successfully'
+      message: 'Booking created successfully',
     });
-
   } catch (error) {
     console.error('Booking creation error:', error);
     res.status(500).json({
       success: false,
       error: error.message,
-      message: 'Error creating booking'
+      message: 'Error creating booking',
     });
   }
 };
+
+function convertTo24HourFormat(timeStr) {
+  const [time, period] = timeStr.split(/(?=[AP]M)/i);
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (period?.toUpperCase() === 'PM' && hours < 12) hours += 12;
+  if (period?.toUpperCase() === 'AM' && hours === 12) hours = 0;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
+function isTimeOverlap(start1, end1, start2, end2) {
+  return start1 <= end2 && end1 >= start2;
+}
+
+function calculateTotalAmount(bookingData) {
+  let total = 0;
+  console.log('Calculating total for:', bookingData);
+
+  if (bookingData.cuisine?.price) {
+    total += bookingData.cuisine.price;
+    console.log(`Cuisine cost: ${bookingData.cuisine.price}`);
+  }
+
+  if (bookingData.confirmedFoods?.length) {
+    const foodCost = bookingData.confirmedFoods.reduce(
+      (sum, food) => sum + food.price * food.quantity,
+      0
+    );
+    total += foodCost;
+    console.log(`Food cost: ${foodCost}`);
+  }
+
+  console.log(`Total amount: ${total}`);
+  return total;
+}
 
 function convertTo24HourFormat(timeStr) {
   const [time, period] = timeStr.split(/(?=[AP]M)/i);

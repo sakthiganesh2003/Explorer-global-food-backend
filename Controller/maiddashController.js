@@ -8,7 +8,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const getMaidProfile = async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.params;
     if (!userId) {
       return res.status(401).json({
         success: false,
