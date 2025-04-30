@@ -29,11 +29,13 @@ const paymentRoutes = require('./Routes/payments/paymentroutes');
 //chef
 const chefRoutes = require('./Routes/chef/chefformroutes');
 
+const chefpostRoutes = require('./Routes/chef/postroutes');
+
 // const modeofpaymentRoutes = require('./Routes/payments/');
 
-// Increase payload size limit 50MB 
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+// // Increase payload size limit 50MB 
+// app.use(bodyParser.json({ limit: '50mb' }));
+// app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Middleware
 app.use(express.json());
@@ -67,6 +69,7 @@ app.use('/api/book', bookingidroutes );
 
 //chef routes
 app.use('/api/chefs', chefRoutes);
+app.use('/api/chefposts', chefpostRoutes);
 
   // Make sure this matches the controller
 

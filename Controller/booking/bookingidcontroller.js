@@ -13,20 +13,23 @@ exports.getAllBookings = async (req, res) => {
   }
 };
 
-// Get a single booking by maidId
-exports.getBookingById = async (req, res) => {
-    try {
-      const booking = await Booking.findOne({ maidId: req.params.id })
-        .populate('userId', 'fullName email')
-        .populate('maidId', 'fullName specialties rating experience hourlyRate');
-      if (!booking) {
-        return res.status(404).json({ message: 'Booking not found' });
-      }
-      res.status(200).json(booking);
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching booking', error: error.message });
+exports.getBookingByMaidId = async (req, res) => {
+  try {
+    const bookings = await Booking.find({ maidId: req.params.id })
+      .populate('userId', 'fullName email')
+      .populate('maidId', 'fullName cooking specialties ');
+
+    if (!bookings || bookings.length === 0) {
+      return res.status(404).json({ message: 'No bookings found for this maid' });
     }
-  };
+
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ message: 'Error fetching booking', error: error.message });
+  }
+};
+
 
   
 // Create a new booking

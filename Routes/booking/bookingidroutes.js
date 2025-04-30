@@ -4,7 +4,7 @@ const bookingController = require('../../Controller/booking/bookingidcontroller'
 
 // Routes for booking operations
 router.get('/', bookingController.getAllBookings);
-router.get('/:id', bookingController.getBookingById);
+router.get('/:id', bookingController.getBookingByMaidId);
 router.post('/', bookingController.createBooking);
 router.put('/:id', bookingController.updateBooking);
 router.delete('/:id', bookingController.deleteBooking);
