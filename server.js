@@ -31,7 +31,12 @@ const chefRoutes = require('./Routes/chef/chefformroutes');
 
 const chefpostRoutes = require('./Routes/chef/postroutes');
 
+
 // const modeofpaymentRoutes = require('./Routes/payments/');
+//user
+const userRoutes = require('./Routes/user/userprofileroutes');
+
+const refundsRoutes = require('./Routes/booking/refundroutes');
 
 // // Increase payload size limit 50MB 
 // app.use(bodyParser.json({ limit: '50mb' }));
@@ -70,6 +75,11 @@ app.use('/api/book', bookingidroutes );
 //chef routes
 app.use('/api/chefs', chefRoutes);
 app.use('/api/chefposts', chefpostRoutes);
+
+
+//user routes
+app.use('/api/user', userRoutes);
+app.use('/api/refunds', refundsRoutes);
 
   // Make sure this matches the controller
 

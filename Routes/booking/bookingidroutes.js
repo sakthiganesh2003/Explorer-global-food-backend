@@ -3,12 +3,20 @@ const router = express.Router();
 const bookingController = require('../../Controller/booking/bookingidcontroller');
 
 // Routes for booking operations
+router.get('/reject', bookingController.rejectBookings);
+
+
 router.get('/', bookingController.getAllBookings);
 router.get('/:id', bookingController.getBookingByMaidId);
+router.get('/user/:id', bookingController.getBookingByUserId);
 router.post('/', bookingController.createBooking);
 router.put('/:id', bookingController.updateBooking);
 router.delete('/:id', bookingController.deleteBooking);
-router.put('/:id/accept', bookingController.acceptBooking);
-router.put('/:id/reject', bookingController.rejectBooking);
+router.put('/status/:id', bookingController.updateBookingStatus);
+
+router.post('/refund', bookingController.handleRejection)
+
+
+
 
 module.exports = router;

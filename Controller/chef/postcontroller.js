@@ -1,80 +1,70 @@
-const Recipe = require('../../Models/chef/post'); // Adjust path if needed
-const mongoose = require('mongoose');
+const Recipe = require('../../Models/chef/post'); // Adjusted path
 const cloudinary = require('cloudinary').v2;
-const fs = require('fs'); // To delete local files if needed
+const fs = require('fs');
 
 // Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const recipeController = {
-    createRecipe: async (req, res) => {
-      try {
-        const {
-          chef_id,
-          recipe_name,
-          category_type,
-          instructions,
-          date_time,
-          cuisine_type,
-          file, // Add file to destructured req.body
-        } = req.body;
-  
-        // Validate required fields
-        if (!chef_id || !recipe_name || !category_type || !instructions || !date_time || !cuisine_type) {
-          return res.status(400).json({ error: 'All fields are required' });
-        }
-  
-        let image_videos = {};
-  
-        if (req.file) {
-          // Handle file upload to Cloudinary
-          const result = await cloudinary.uploader.upload(req.file.path, {
-            resource_type: 'auto',
-            folder: 'recipes',
-          });
-  
-          // Delete local file
-          fs.unlinkSync(req.file.path);
-  
-          image_videos = {
-            url: result.secure_url,
-            public_id: result.public_id,
-          };
-        } else if (file) {
-          // Use provided URL
-          image_videos = {
-            url: file,
-            public_id: 'external_url_' + Date.now(), // Placeholder public_id (or make public_id optional in schema)
-          };
-        } else {
-          return res.status(400).json({ error: 'Image or video is required' });
-        }
-  
-        const recipe = new Recipe({
-          chef_id,
-          image_videos,
-          recipe_name,
-          category_type,
-          instructions,
-          date_time,
-          cuisine_type,
+  createRecipe: async (req, res) => {
+    try {
+      const {
+        recipe_name,
+        category_type,
+        instructions,
+        date_time,
+        cuisine_type,
+        ingredients,
+        prep_time,
+        cook_time,
+        servings,
+      } = req.body;
+
+      // Validation is handled by middleware (validateRecipe)
+      let image_videos = {};
+
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          resource_type: 'auto',
+          folder: 'recipes',
         });
-  
-        const savedRecipe = await recipe.save();
-        res.status(201).json(savedRecipe);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error while creating recipe' });
+
+        fs.unlinkSync(req.file.path);
+        image_videos = {
+          url: result.secure_url,
+          public_id: result.public_id,
+        };
       }
-    },
+
+      const recipe = new Recipe({
+        recipe_name,
+        category_type,
+        instructions,
+        date_time: date_time || Date.now(),
+        cuisine_type,
+        ingredients,
+        prep_time,
+        cook_time,
+        servings,
+        image_videos,
+        created_by: req.user.id, // Set from auth middleware
+      });
+
+      const savedRecipe = await recipe.save();
+      res.status(201).json(savedRecipe);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error while creating recipe' });
+    }
+  },
 
   getAllRecipes: async (req, res) => {
     try {
-      const recipes = await Recipe.find().populate('chef_id', 'name email');
+      const recipes = await Recipe.find().populate('created_by', 'name email');
       res.json(recipes);
     } catch (error) {
       res.status(500).json({ error: 'Server error while fetching recipes' });
@@ -83,26 +73,25 @@ const recipeController = {
 
   getRecipeById: async (req, res) => {
     try {
-      const recipe = await Recipe.findById(req.params.id)
-        .populate('chef_id', 'name email');
-  
+      const recipe = await Recipe.findById(req.params.id).populate(
+        'created_by',
+        'name email'
+      );
+
       if (!recipe) {
         return res.status(404).json({ error: 'Recipe not found' });
       }
-  
-      // Send chef_id separately along with the populated chef object
+
       const response = {
-        ...recipe.toObject(), // Converts the Mongoose document to a plain object
-        chef_raw_id: recipe.chef_id._id, // Explicitly include raw ID
+        ...recipe.toObject(),
+        created_by_raw_id: recipe.created_by?._id,
       };
-  
+
       res.json(response);
     } catch (error) {
       res.status(500).json({ error: 'Server error while fetching recipe' });
     }
   },
-  
-  
 
   updateRecipe: async (req, res) => {
     try {
@@ -114,29 +103,32 @@ const recipeController = {
         return res.status(404).json({ error: 'Recipe not found' });
       }
 
+      if (recipe.created_by.toString() !== req.user.id) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+
       if (req.file) {
-        // Delete previous image/video from Cloudinary
         if (recipe.image_videos?.public_id) {
           await cloudinary.uploader.destroy(recipe.image_videos.public_id);
         }
 
         const result = await cloudinary.uploader.upload(req.file.path, {
           resource_type: 'auto',
-          folder: 'recipes'
+          folder: 'recipes',
         });
 
         fs.unlinkSync(req.file.path);
         image_videos = {
           url: result.secure_url,
-          public_id: result.public_id
+          public_id: result.public_id,
         };
       }
 
       const updatedRecipe = await Recipe.findByIdAndUpdate(
         req.params.id,
-        { $set: { ...updates, image_videos } },
+        { $set: { ...updates, image_videos, created_by: req.user.id } },
         { new: true }
-      ).populate('chef_id', 'name email');
+      ).populate('created_by', 'name email');
 
       res.json(updatedRecipe);
     } catch (error) {
@@ -146,20 +138,25 @@ const recipeController = {
 
   deleteRecipe: async (req, res) => {
     try {
-      const recipe = await Recipe.findByIdAndDelete(req.params.id);
+      const recipe = await Recipe.findById(req.params.id);
       if (!recipe) {
         return res.status(404).json({ error: 'Recipe not found' });
+      }
+
+      if (recipe.created_by.toString() !== req.user.id) {
+        return res.status(403).json({ error: 'Unauthorized' });
       }
 
       if (recipe.image_videos?.public_id) {
         await cloudinary.uploader.destroy(recipe.image_videos.public_id);
       }
 
+      await recipe.deleteOne();
       res.json({ message: 'Recipe deleted successfully' });
     } catch (error) {
       res.status(500).json({ error: 'Server error while deleting recipe' });
     }
-  }
+  },
 };
 
 module.exports = recipeController;

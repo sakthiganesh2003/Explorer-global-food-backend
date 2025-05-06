@@ -276,7 +276,7 @@ const verifyPayment = async (req, res) => {
     });
 
     // Update booking status
-    booking.status = 'confirmed';
+    booking.status = 'pending';
     booking.razorpayOrderId = undefined;
 
     // Save transaction data
