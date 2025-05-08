@@ -6,11 +6,19 @@ const recipeSchema = new mongoose.Schema({
   instructions: { type: String, required: true },
   date_time: { type: Date, default: Date.now },
   cuisine_type: { type: String, required: true },
-  ingredients: { type: String, required: true },
+  ingredients: { type: [String], required: true },
   prep_time: { type: String },
   cook_time: { type: String },
   servings: { type: String },
-  image_url: { type: String },
+  media: {
+    url: String,
+    public_id: String,
+    media_type: String,
+    width: Number,
+    height: Number,
+    format: String,
+    duration: Number,},
+    
   created_at: { type: Date, default: Date.now },
 }, { timestamps: true });
 

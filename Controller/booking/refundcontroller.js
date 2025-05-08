@@ -1,12 +1,12 @@
-const { Refunds } = require("../../Models/booking/refund"); // Changed to destructure { Refunds }
+const { Refunds } = require("../../Models/booking/refund");
 const Razorpay = require("razorpay");
 const Booking = require("../../Models/booking/bookingmodel");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 const dotenv = require("dotenv");
-const { promisify } = require("util");
 const fs = require("fs");
+const path = require("path");
 
 dotenv.config();
 
@@ -15,16 +15,16 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-cloudinary.v2.config({
+cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_secret: process.env.CLOUDINARY_API_SECRET || "undefined",
 });
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
+    allowable: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
   tls: {
@@ -33,11 +33,38 @@ const transporter = nodemailer.createTransport({
 });
 
 const uploadImageToCloudinary = async (imagePath, retries = 5, initialDelay = 2000) => {
+  // Re-apply configuration to ensure it’s set
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+
+
+  // Log configuration for debugging
+  console.log("Cloudinary Config:", {
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET ? "****" : undefined,
+  });
+
+  // Verify Cloudinary uploader is available
+  if (!cloudinary.uploader) {
+    throw new Error("Cloudinary uploader is not initialized");
+  }
+
+  // Verify file accessibility
   try {
-    const upload = promisify(cloudinary.v2.uploader.upload);
-    const result = await upload(imagePath, {
+    await fs.promises.access(imagePath, fs.constants.R_OK);
+    console.log("File is accessible:", imagePath);
+  } catch (error) {
+    throw new Error(`File is not accessible: ${error.message}`);
+  }
+
+  try {
+    const result = await cloudinary.v2.uploader.upload(imagePath, {
       folder: "refunds",
-      timeout: 60000, // Set a 60-second timeout for the upload
+      timeout: 60000,
     });
     console.log("Cloudinary upload success:", result.secure_url);
     return result.secure_url;
@@ -48,7 +75,7 @@ const uploadImageToCloudinary = async (imagePath, retries = 5, initialDelay = 20
       retryCount: retries,
     });
     if (retries > 0) {
-      const delay = initialDelay * (6 - retries); // Exponential backoff: 2s, 4s, 6s, 8s, 10s
+      const delay = initialDelay * (6 - retries);
       console.log(`Retrying Cloudinary upload... Attempts left: ${retries}, Delay: ${delay}ms`);
       await new Promise((resolve) => setTimeout(resolve, delay));
       return uploadImageToCloudinary(imagePath, retries - 1, initialDelay);
@@ -59,7 +86,7 @@ const uploadImageToCloudinary = async (imagePath, retries = 5, initialDelay = 20
 
 exports.fetchAllRefunds = async (req, res) => {
   try {
-    const refunds = await Refunds.find() // Changed Refund to Refunds
+    const refunds = await Refunds.find()
       .populate({
         path: "bookingId",
         select: "amountRefunded status refundedAt createdAt userId",
@@ -87,7 +114,7 @@ exports.createRefundRequest = async (req, res) => {
     }
 
     // Check for existing refund using findOne
-    const existingRefund = await Refunds.findOne({ bookingId }); // Changed Refund to Refunds
+    const existingRefund = await Refunds.findOne({ bookingId });
     if (existingRefund) {
       return res.status(400).json({
         success: false,
@@ -96,7 +123,7 @@ exports.createRefundRequest = async (req, res) => {
     }
 
     // Create new refund
-    const refund = await Refunds.create({ bookingId, amount }); // Changed Refund to Refunds
+    const refund = await Refunds.create({ bookingId, amount });
     res.status(200).json({
       success: true,
       data: refund,
@@ -110,44 +137,55 @@ exports.createRefundRequest = async (req, res) => {
 
 exports.updateRefundProof = async (req, res) => {
   try {
-    console.log("Update refund proof request:", {
-      params: req.params,
-      body: req.body,
-      file: req.file,
-    });
-
     const { id } = req.params;
-    let { adminComment } = req.body;
+    let { adminComment, proofBase64 } = req.body;
 
-    if (!req.file) {
-      console.log("No proof file provided");
+    let localFilePath;
+
+    // 🖼️ Check if using base64 (raw JSON input)
+    if (proofBase64) {
+      const matches = proofBase64.match(/^data:(image\/(jpeg|png|gif));base64,(.+)$/);
+      if (!matches) {
+        return res.status(400).json({ success: false, error: "Invalid image format (must be Base64 JPEG/PNG/GIF)" });
+      }
+
+      const extension = matches[2];
+      const imageData = matches[3];
+      localFilePath = path.join(__dirname, `../Uploads/refund-${Date.now()}.${extension}`);
+      fs.writeFileSync(localFilePath, Buffer.from(imageData, "base64"));
+    }
+
+    // 🖼️ Otherwise fallback to req.file (multipart form-data)
+    else if (req.file) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedTypes.includes(req.file.mimetype)) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ success: false, error: "Only JPEG, PNG, or GIF images allowed" });
+      }
+
+      try {
+        await fs.promises.access(req.file.path, fs.constants.R_OK);
+      } catch (error) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ success: false, error: "Invalid or corrupted file" });
+      }
+
+      localFilePath = req.file.path;
+    } else {
       return res.status(400).json({ success: false, error: "Proof image is required" });
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-    if (!allowedTypes.includes(req.file.mimetype)) {
-      fs.unlinkSync(req.file.path);
-      return res.status(400).json({ success: false, error: "Only JPEG, PNG, or GIF images allowed" });
-    }
+    // 🔐 Sanitize admin comment
+    adminComment = (adminComment || "").replace(/[<>"'&]/g, "");
 
-    // Validate file integrity
-    try {
-      await fs.promises.access(req.file.path, fs.constants.R_OK);
-    } catch (error) {
-      console.error("Invalid or inaccessible file:", error);
-      fs.unlinkSync(req.file.path);
-      return res.status(400).json({ success: false, error: "Invalid or corrupted file" });
-    }
-
-    adminComment = adminComment.replace(/[<>"'&]/g, "");
-
-    const localFilePath = req.file.path;
+    // ☁️ Upload to Cloudinary
     let cloudinaryUrl;
     try {
       cloudinaryUrl = await uploadImageToCloudinary(localFilePath);
     } catch (error) {
-      console.error("Cloudinary upload failed:", error);
-      fs.unlinkSync(localFilePath);
+      if (fs.existsSync(localFilePath)) {
+        fs.unlinkSync(localFilePath);
+      }
       return res.status(500).json({
         success: false,
         error: "Failed to upload proof image to Cloudinary",
@@ -155,13 +193,14 @@ exports.updateRefundProof = async (req, res) => {
       });
     }
 
+    // 🧹 Delete local file
     fs.unlink(localFilePath, (err) => {
       if (err) console.error("Error deleting local file:", err);
     });
 
-    const refund = await Refunds.findById(id); // Changed Refund to Refunds
+    // 🔄 Update refund record
+    const refund = await Refunds.findById(id);
     if (!refund) {
-      console.log("Refund not found for ID:", id);
       return res.status(404).json({ success: false, error: "Refund request not found" });
     }
 
@@ -170,114 +209,41 @@ exports.updateRefundProof = async (req, res) => {
     refund.status = "refunded";
     refund.updatedAt = Date.now();
     await refund.save();
-    console.log("Refund updated:", refund);
 
+    // 📦 Get booking & user info
     const booking = await Booking.findById(refund.bookingId).populate("userId");
     if (!booking || !booking.userId) {
-      console.log("Booking or user not found for refund:", refund.bookingId);
       return res.status(404).json({ success: false, error: "Booking or User not found" });
     }
 
     const user = booking.userId;
 
+    // 📧 Send email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
       subject: "Refund Proof Submitted",
       html: `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Refund Proof Submitted</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-              background-color: #f4f4f9;
-              color: #333;
-            }
-            .container {
-              width: 100%;
-              max-width: 600px;
-              margin: 0 auto;
-              background-color: #ffffff;
-              padding: 20px;
-              border-radius: 8px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            .header {
-              background-color: #007bff;
-              color: #ffffff;
-              text-align: center;
-              padding: 15px 0;
-              border-radius: 8px 8px 0 0;
-            }
-            .header h1 {
-              margin: 0;
-            }
-            .content {
-              margin-top: 20px;
-              font-size: 16px;
-            }
-            .content p {
-              line-height: 1.6;
-            }
-            .content .proof {
-              margin-top: 15px;
-              padding: 10px;
-              background-color: #f9f9f9;
-              border: 1px solid #ddd;
-              border-radius: 4px;
-            }
-            .footer {
-              margin-top: 30px;
-              font-size: 14px;
-              color: #777;
-              text-align: center;
-            }
-            .footer a {
-              color: #007bff;
-              text-decoration: none;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Refund Processed</h1>
-            </div>
-            <div class="content">
-              <p>Dear <strong>${user.name}</strong>,</p>
-              <p>Your refund request for booking ID: <strong>${refund.bookingId}</strong> has been successfully processed. Below are the details:</p>
-              <div class="proof">
-                <p><strong>Admin Comment:</strong> ${adminComment}</p>
-                <p><strong>Refund Proof:</strong></p>
-                <p><a href="${cloudinaryUrl}" target="_blank">View refund proof</a></p>
-              </div>
-              <p>If you have any questions, feel free to reach out to us.</p>
-              <p>Best regards,</p>
-              <p>The TravelerConnect Team</p>
-            </div>
-            <div class="footer">
-              <p><a href="https://www.travelerconnect.com">Visit our website</a></p>
-            </div>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h2 style="color: #007bff;">Refund Processed</h2>
+          <p>Dear <strong>${user.name}</strong>,</p>
+          <p>Your refund for booking ID <strong>${refund.bookingId}</strong> has been processed.</p>
+          <div style="background: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <p><strong>Admin Comment:</strong> ${adminComment}</p>
+            <p><strong>Proof:</strong> <a href="${cloudinaryUrl}" target="_blank">View Image</a></p>
           </div>
-        </body>
-        </html>
+          <p>Thank you for using TravelerConnect.</p>
+        </div>
       `,
     };
 
     try {
       await transporter.sendMail(mailOptions);
-      console.log("Email sent to:", user.email);
     } catch (emailError) {
-      console.error("Email sending failed:", emailError);
+      console.error("Failed to send email:", emailError.message);
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: refund,
       message: "Refund proof submitted successfully",
@@ -287,7 +253,7 @@ exports.updateRefundProof = async (req, res) => {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Server error",
       details: error.message,
