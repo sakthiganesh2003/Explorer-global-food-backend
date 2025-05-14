@@ -14,7 +14,11 @@ router.put('/:id', bookingController.updateBooking);
 router.delete('/:id', bookingController.deleteBooking);
 router.put('/status/:id', bookingController.updateBookingStatus);
 
-router.post('/refund', bookingController.handleRejection)
+router.post('/refund', bookingController.handleRejection);
+ router.get('/payment-details/:id', bookingController.getPaymentDetailsByBookingId);
+
+router.get('/total', bookingController.getTotalBookings);
+ console.log("Total Orders Route Hit");
 
 
 

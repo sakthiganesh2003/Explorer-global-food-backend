@@ -8,7 +8,8 @@ const {
     resetPassword, 
     verifyEmail, 
     resendVerificationEmail,
-    
+    getalluser,
+    deleteUser,
     
     uploadGovernmentIdAndBecomeInstructor,
     
@@ -61,5 +62,8 @@ router.get("/verify-chef-email/:token", verifyChefEmail);
 router.post("/forgot-password", forgotPassword);
 router.post("/verify-reset-code", verifyResetCode);
 router.post("/reset-password", resetPassword);
+
+router.get("/getalluser", getalluser);
+router.delete("/deleteuser/:id", deleteUser);
 
 module.exports = router;

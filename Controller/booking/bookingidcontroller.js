@@ -234,66 +234,175 @@ exports.rejectBookings = async (req, res) => {
   }
 };
 
-exports.handleRejection = async (req, res) => {
-  try {
-    // Handle file upload
-    upload(req, res, async (err) => {
+// Handle reservation rejection
+exports.handleRejection = function(upload) {
+  return function(req, res) {
+    upload.single('paymentProof')(req, res, function(err) {
       if (err) {
+        console.error('File upload error:', err);
         return res.status(400).json({ message: 'File upload error', error: err.message });
       }
 
-      const { bookingId, refundAmount, refundReason, paymentStatus, partialAmount } = req.body;
+      try {
+        var bookingId = req.body.bookingId;
+        var refundAmount = req.body.refundAmount;
+        var refundReason = req.body.refundReason;
+        var paymentStatus = req.body.paymentStatus;
 
-      // Validate inputs
-      if (!mongoose.isValidObjectId(bookingId)) {
-        return res.status(400).json({ message: 'Invalid booking ID' });
-      }
-      if (!['paid', 'unpaid', 'partial'].includes(paymentStatus)) {
-        return res.status(400).json({ message: 'Invalid payment status' });
-      }
-      if (paymentStatus === 'partial' && (!partialAmount || partialAmount <= 0)) {
-        return res.status(400).json({ message: 'Partial amount must be greater than 0' });
-      }
-      if (refundAmount < 0) {
-        return res.status(400).json({ message: 'Refund amount cannot be negative' });
-      }
+        // Validate inputs
+        if (!mongoose.isValidObjectId(bookingId)) {
+          return res.status(400).json({ message: 'Invalid reservation ID' });
+        }
+        if (!['paid', 'unpaid'].includes(paymentStatus)) {
+          return res.status(400).json({ message: 'Invalid payment status' });
+        }
+        if (refundAmount && parseFloat(refundAmount) < 0) {
+          return res.status(400).json({ message: 'Refund amount cannot be negative' });
+        }
 
-      // Find booking
-      const booking = await Booking.findById(bookingId).populate('userId', 'email');
-      if (!booking) {
-        return res.status(404).json({ message: 'Booking not found' });
+        // Find reservation
+        Reservation.findById(bookingId).populate('userId', 'email').exec(function(err, reservation) {
+          if (err) {
+            console.error('Error finding reservation:', err);
+            return res.status(500).json({ message: 'Error finding reservation', error: err.message });
+          }
+          if (!reservation) {
+            return res.status(404).json({ message: 'Reservation not found' });
+          }
+
+          // Check if already cancelled
+          if (reservation.status === 'cancelled') {
+            return res.status(400).json({ message: 'Reservation is already cancelled' });
+          }
+
+          // Handle Cloudinary upload if file exists
+          var paymentProof = reservation.paymentProof || '';
+          if (req.file) {
+            try {
+              // Delete existing payment proof from Cloudinary if it exists
+              if (reservation.paymentProof) {
+                var publicId = reservation.paymentProof.split('/').pop().split('.')[0];
+                cloudinary.uploader.destroy('payment_proofs/' + publicId, function(error) {
+                  if (error) {
+                    console.error('Error deleting old payment proof from Cloudinary:', error);
+                  }
+                });
+              }
+
+              // Upload new file
+              cloudinary.uploader.upload(req.file.path, {
+                folder: 'payment_proofs',
+                resource_type: 'image'
+              }, function(error, result) {
+                if (error) {
+                  console.error('Cloudinary upload error:', error);
+                  return res.status(400).json({
+                    message: 'Failed to upload proof image to Cloudinary',
+                    error: error.message
+                  });
+                }
+                paymentProof = result.secure_url;
+
+                // Update reservation
+                reservation.status = 'cancelled';
+                reservation.paymentStatus = paymentStatus;
+                reservation.refundedAmount = parseFloat(refundAmount) || 0;
+                reservation.refundedReason = refundReason || '';
+                if (paymentProof) {
+                  reservation.paymentProof = paymentProof;
+                }
+
+                // Save reservation
+                reservation.save(function(err) {
+                  if (err) {
+                    console.error('Error saving reservation:', err);
+                    return res.status(500).json({ message: 'Error saving reservation', error: err.message });
+                  }
+
+                  // Send email notification
+                  var userEmail = reservation.userId.email;
+                  var subject = 'Reservation Cancellation and Refund';
+                  var text = 'Dear User,\n\nYour reservation (ID: ' + reservation._id + ') has been cancelled.\n\nDetails:\n- Date: ' + reservation.time.date + '\n- Time: ' + reservation.time.time.join(', ') + '\n- Address: ' + reservation.time.address + '\n- Total Amount: ' + reservation.totalAmount + '\n- Refund Amount: ' + reservation.refundedAmount + '\n- Refund Reason: ' + (reservation.refundedReason || 'Not specified') + '\n- Payment Status: ' + reservation.paymentStatus + '\n\nPlease contact support for any questions.\n\nBest regards,\nReservation Service Team';
+
+                  sendEmail(userEmail, subject, text, function(err) {
+                    if (err) {
+                      console.error('Error sending email:', err);
+                    }
+                    res.status(200).json({ message: 'Reservation cancelled successfully', reservation: reservation });
+                  });
+                });
+              });
+            } catch (cloudinaryError) {
+              console.error('Cloudinary upload error:', cloudinaryError);
+              return res.status(400).json({
+                message: 'Failed to upload proof image to Cloudinary',
+                error: cloudinaryError.message
+              });
+            }
+          } else {
+            // Update reservation without file upload
+            reservation.status = 'cancelled';
+            reservation.paymentStatus = paymentStatus;
+            reservation.refundedAmount = parseFloat(refundAmount) || 0;
+            reservation.refundedReason = refundReason || '';
+            if (paymentProof) {
+              reservation.paymentProof = paymentProof;
+            }
+
+            // Save reservation
+            reservation.save(function(err) {
+              if (err) {
+                console.error('Error saving reservation:', err);
+                return res.status(500).json({ message: 'Error saving reservation', error: err.message });
+              }
+
+              // Send email notification
+              var userEmail = reservation.userId.email;
+              var subject = 'Reservation Cancellation and Refund';
+              var text = 'Dear User,\n\nYour reservation (ID: ' + reservation._id + ') has been cancelled.\n\nDetails:\n- Date: ' + reservation.time.date + '\n- Time: ' + reservation.time.time.join(', ') + '\n- Address: ' + reservation.time.address + '\n- Total Amount: ' + reservation.totalAmount + '\n- Refund Amount: ' + reservation.refundedAmount + '\n- Refund Reason: ' + (reservation.refundedReason || 'Not specified') + '\n- Payment Status: ' + reservation.paymentStatus + '\n\nPlease contact support for any questions.\n\nBest regards,\nReservation Service Team';
+
+              sendEmail(userEmail, subject, text, function(err) {
+                if (err) {
+                  console.error('Error sending email:', err);
+                }
+                res.status(200).json({ message: 'Reservation cancelled successfully', reservation: reservation });
+              });
+            });
+          }
+        });
+      } catch (error) {
+        console.error('Error handling reservation rejection:', error);
+        res.status(500).json({ message: 'Error handling reservation rejection', error: error.message });
       }
+    });
+  };
+};
 
-      // Check if already cancelled
-      if (booking.status === 'cancelled') {
-        return res.status(400).json({ message: 'Booking is already cancelled' });
-      }
+exports.getPaymentDetailsByBookingId = async (req, res) => { 
+  try {
+    const bookingId = req.params.id;
+    const booking = await Booking.findById(bookingId).select('paymentMode');
 
-      // Update booking
-      booking.status = 'reject';
-      booking.paymentStatus = paymentStatus;
-      booking.refundAmount = parseFloat(refundAmount) || 0;
-      booking.refundReason = refundReason || '';
-      if (paymentStatus === 'partial') {
-        booking.partialAmount = parseFloat(partialAmount) || 0;
-      }
-      if (req.file) {
-        booking.paymentProof = `/uploads/${req.file.filename}`; // Store relative path
-      }
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
 
-      await booking.save();
-
-      // Send email notification
-      const userEmail = booking.userId.email;
-      const subject = 'Booking Cancellation and Refund';
-      const text = `Dear User,\n\nYour booking (ID: ${booking._id}) has been cancelled.\n\nDetails:\n- Date: ${booking.time.date}\n- Time: ${booking.time.time.join(', ')}\n- Address: ${booking.time.address}\n- Total Amount: ${booking.totalAmount}\n- Refund Amount: ${booking.refundAmount}\n- Refund Reason: ${booking.refundReason || 'Not specified'}\n- Payment Status: ${booking.paymentStatus}${booking.paymentStatus === 'partial' ? ` (Partial Amount: ${booking.partialAmount})` : ''}\n\nPlease contact support for any questions.\n\nBest regards,\nBooking Service Team`;
-
-      await sendEmail(userEmail, subject, text);
-
-      res.status(200).json({ message: 'Booking cancelled successfully', booking });
+    res.status(200).json({ 
+      message: 'Payment details retrieved successfully', 
+      paymentMode: booking.paymentMode 
     });
   } catch (error) {
-    console.error('Error handling booking rejection:', error);
-    res.status(500).json({ message: 'Error handling booking rejection', error: error.message });
+    console.error('Error retrieving payment details:', error);
+    res.status(500).json({ message: 'Error retrieving payment details', error: error.message });
+  }
+};
+
+exports.getTotalBookings = async (req, res) => {
+ try {
+    const totalBookings = await Booking.countDocuments();
+    res.status(200).json({ totalBookings });
+  } catch (error) {
+    console.error('Error fetching total bookings:', error);
+    res.status(500).json({ message: 'Error fetching total bookings', error: error.message });
   }
 };

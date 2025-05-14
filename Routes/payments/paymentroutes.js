@@ -12,4 +12,6 @@ router.post('/initiate', initiatePayment); // Line 10: Error here
 // Verify payment (webhook or frontend callback)
 router.post('/verify', verifyPayment);
 
+// router.get('/success', getpaymentdetails)
+
 module.exports = router;

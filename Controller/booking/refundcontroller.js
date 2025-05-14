@@ -1,30 +1,25 @@
 const { Refunds } = require("../../Models/booking/refund");
-const Razorpay = require("razorpay");
 const Booking = require("../../Models/booking/bookingmodel");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const cloudinary = require("cloudinary").v2;
-const dotenv = require("dotenv");
 const fs = require("fs");
 const path = require("path");
+const dotenv = require("dotenv");
+
 
 dotenv.config();
-
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET || "undefined",
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    allowable: process.env.EMAIL_USER,
+    user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
   tls: {
@@ -33,27 +28,6 @@ const transporter = nodemailer.createTransport({
 });
 
 const uploadImageToCloudinary = async (imagePath, retries = 5, initialDelay = 2000) => {
-  // Re-apply configuration to ensure it’s set
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
-
-
-  // Log configuration for debugging
-  console.log("Cloudinary Config:", {
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET ? "****" : undefined,
-  });
-
-  // Verify Cloudinary uploader is available
-  if (!cloudinary.uploader) {
-    throw new Error("Cloudinary uploader is not initialized");
-  }
-
-  // Verify file accessibility
   try {
     await fs.promises.access(imagePath, fs.constants.R_OK);
     console.log("File is accessible:", imagePath);
@@ -62,7 +36,7 @@ const uploadImageToCloudinary = async (imagePath, retries = 5, initialDelay = 20
   }
 
   try {
-    const result = await cloudinary.v2.uploader.upload(imagePath, {
+    const result = await cloudinary.uploader.upload(imagePath, {
       folder: "refunds",
       timeout: 60000,
     });
@@ -99,93 +73,37 @@ exports.fetchAllRefunds = async (req, res) => {
     res.status(200).json({ success: true, data: refunds });
   } catch (error) {
     console.error("Error fetching refunds:", error);
-    res.status(500).json({ success: false, error: "Failed to fetch refunds" });
-  }
-};
-
-exports.createRefundRequest = async (req, res) => {
-  const { bookingId, amount } = req.body;
-  console.log("Create refund request:", { bookingId, amount });
-
-  try {
-    // Validate bookingId
-    if (!mongoose.isValidObjectId(bookingId)) {
-      return res.status(400).json({ success: false, error: "Invalid booking ID" });
-    }
-
-    // Check for existing refund using findOne
-    const existingRefund = await Refunds.findOne({ bookingId });
-    if (existingRefund) {
-      return res.status(400).json({
-        success: false,
-        error: "Refund request already exists for this booking",
-      });
-    }
-
-    // Create new refund
-    const refund = await Refunds.create({ bookingId, amount });
-    res.status(200).json({
-      success: true,
-      data: refund,
-      message: "Refund request created successfully",
-    });
-  } catch (error) {
-    console.error("Error creating refund request:", error);
-    res.status(500).json({ success: false, error: "Error creating refund request" });
+    res.status(500).json({ success: false, error: "Failed to fetch refunds", details: error.message });
   }
 };
 
 exports.updateRefundProof = async (req, res) => {
   try {
     const { id } = req.params;
-    let { adminComment, proofBase64 } = req.body;
+    const { adminComment } = req.body;
 
-    let localFilePath;
-
-    // 🖼️ Check if using base64 (raw JSON input)
-    if (proofBase64) {
-      const matches = proofBase64.match(/^data:(image\/(jpeg|png|gif));base64,(.+)$/);
-      if (!matches) {
-        return res.status(400).json({ success: false, error: "Invalid image format (must be Base64 JPEG/PNG/GIF)" });
-      }
-
-      const extension = matches[2];
-      const imageData = matches[3];
-      localFilePath = path.join(__dirname, `../Uploads/refund-${Date.now()}.${extension}`);
-      fs.writeFileSync(localFilePath, Buffer.from(imageData, "base64"));
-    }
-
-    // 🖼️ Otherwise fallback to req.file (multipart form-data)
-    else if (req.file) {
-      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-      if (!allowedTypes.includes(req.file.mimetype)) {
-        fs.unlinkSync(req.file.path);
-        return res.status(400).json({ success: false, error: "Only JPEG, PNG, or GIF images allowed" });
-      }
-
-      try {
-        await fs.promises.access(req.file.path, fs.constants.R_OK);
-      } catch (error) {
-        fs.unlinkSync(req.file.path);
-        return res.status(400).json({ success: false, error: "Invalid or corrupted file" });
-      }
-
-      localFilePath = req.file.path;
-    } else {
+    if (!req.file) {
       return res.status(400).json({ success: false, error: "Proof image is required" });
     }
 
-    // 🔐 Sanitize admin comment
-    adminComment = (adminComment || "").replace(/[<>"'&]/g, "");
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ success: false, error: "Only JPEG, PNG, or GIF images allowed" });
+    }
 
-    // ☁️ Upload to Cloudinary
+    try {
+      await fs.promises.access(req.file.path, fs.constants.R_OK);
+    } catch (error) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ success: false, error: "Invalid or corrupted file" });
+    }
+
     let cloudinaryUrl;
     try {
-      cloudinaryUrl = await uploadImageToCloudinary(localFilePath);
+      cloudinaryUrl = await uploadImageToCloudinary(req.file.path);
     } catch (error) {
-      if (fs.existsSync(localFilePath)) {
-        fs.unlinkSync(localFilePath);
-      }
+      fs.unlinkSync(req.file.path);
       return res.status(500).json({
         success: false,
         error: "Failed to upload proof image to Cloudinary",
@@ -193,24 +111,21 @@ exports.updateRefundProof = async (req, res) => {
       });
     }
 
-    // 🧹 Delete local file
-    fs.unlink(localFilePath, (err) => {
+    fs.unlink(req.file.path, (err) => {
       if (err) console.error("Error deleting local file:", err);
     });
 
-    // 🔄 Update refund record
     const refund = await Refunds.findById(id);
     if (!refund) {
       return res.status(404).json({ success: false, error: "Refund request not found" });
     }
 
     refund.proof = cloudinaryUrl;
-    refund.adminComment = adminComment;
+    refund.adminComment = adminComment ? adminComment.replace(/[<>"'&]/g, "") : null;
     refund.status = "refunded";
-    refund.updatedAt = Date.now();
+    refund.updatedAt = new Date();
     await refund.save();
 
-    // 📦 Get booking & user info
     const booking = await Booking.findById(refund.bookingId).populate("userId");
     if (!booking || !booking.userId) {
       return res.status(404).json({ success: false, error: "Booking or User not found" });
@@ -218,7 +133,6 @@ exports.updateRefundProof = async (req, res) => {
 
     const user = booking.userId;
 
-    // 📧 Send email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
@@ -229,7 +143,7 @@ exports.updateRefundProof = async (req, res) => {
           <p>Dear <strong>${user.name}</strong>,</p>
           <p>Your refund for booking ID <strong>${refund.bookingId}</strong> has been processed.</p>
           <div style="background: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <p><strong>Admin Comment:</strong> ${adminComment}</p>
+            <p><strong>Admin Comment:</strong> ${refund.adminComment || 'None'}</p>
             <p><strong>Proof:</strong> <a href="${cloudinaryUrl}" target="_blank">View Image</a></p>
           </div>
           <p>Thank you for using TravelerConnect.</p>
@@ -258,5 +172,33 @@ exports.updateRefundProof = async (req, res) => {
       error: "Server error",
       details: error.message,
     });
+  }
+};
+
+exports.createRefundRequest = async (req, res) => {
+  const { bookingId, amount } = req.body;
+
+  try {
+    if (!mongoose.isValidObjectId(bookingId)) {
+      return res.status(400).json({ success: false, error: "Invalid booking ID" });
+    }
+
+    const existingRefund = await Refunds.findOne({ bookingId });
+    if (existingRefund) {
+      return res.status(400).json({
+        success: false,
+        error: "Refund request already exists for this booking",
+      });
+    }
+
+    const refund = await Refunds.create({ bookingId, amount });
+    res.status(200).json({
+      success: true,
+      data: refund,
+      message: "Refund request created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating refund request:", error);
+    res.status(500).json({ success: false, error: "Error creating refund request" });
   }
 };

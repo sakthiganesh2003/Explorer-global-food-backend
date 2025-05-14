@@ -237,8 +237,8 @@ const getAllRecipesid = async (req, res) => {
 const getRecipeById = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id).populate(
-      'created_by',
-      'name avatar'
+      '',
+      ''
     );
 
     if (!recipe) {
@@ -387,6 +387,15 @@ const updateRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   try {
+    // Validate recipe ID
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Recipe ID is required',
+      });
+    }
+
+    // Find recipe
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
       return res.status(404).json({
@@ -395,7 +404,23 @@ const deleteRecipe = async (req, res) => {
       });
     }
 
-    // Check ownership
+    // Check if req.user exists (set by auth middleware)
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        error: 'User not authenticated',
+      });
+    }
+
+    // Check ownership if created_by exists
+    if (!recipe.created_by) {
+      console.warn(`Recipe ${recipe._id} has no created_by field`);
+      return res.status(403).json({
+        success: false,
+        error: 'Recipe ownership information missing',
+      });
+    }
+
     if (recipe.created_by.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
@@ -415,6 +440,7 @@ const deleteRecipe = async (req, res) => {
       }
     }
 
+    // Delete recipe
     await recipe.deleteOne();
     res.json({
       success: true,

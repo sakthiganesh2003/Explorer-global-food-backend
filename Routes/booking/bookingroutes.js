@@ -18,6 +18,7 @@ router.route('/:id')
   .get(getBooking)
   .put(updateBooking)
   .delete(deleteBooking);
+  
 
 router.route('/:id/status')
   .put(updateBookingStatus);
