@@ -1,9 +1,17 @@
 const express = require('express');
-const router = express.Router();
-const { getUserProfile, updateUserProfile } = require('../../Controller/user/userprofilecontroller'); // Adjust path to your controller
-// const authMiddleware = require('../middleware/authMiddleware');
+const { createStudentProfile, updateStudentProfile, deleteStudentProfile, getStudentProfile, getStudentProfileByUserId, updateStudentProfileByUserId } = require('../../Controller/user/userprofilecontroller');
+const Router = express.Router();
 
-router.get('/profile', getUserProfile);
-router.put('/profile', updateUserProfile);
+Router.route('/')
+  .post(createStudentProfile);
 
-module.exports = router;
+Router.route('/:id')
+  .get(getStudentProfile)
+  .patch(updateStudentProfile)
+  .delete(deleteStudentProfile);
+
+Router.get('/user/:userId', getStudentProfileByUserId);
+
+Router.put('/user/:userId', updateStudentProfileByUserId);
+
+module.exports = Router;

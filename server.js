@@ -35,6 +35,7 @@ const chefpostRoutes = require('./Routes/chef/postroutes');
 // const modeofpaymentRoutes = require('./Routes/payments/');
 //user
 const userRoutes = require('./Routes/user/userprofileroutes');
+const predefineRoutes = require('./Routes/user/predefine'); 
 
 const refundsRoutes = require('./Routes/booking/refundroutes');
 
@@ -79,6 +80,10 @@ app.use('/api/chefposts', chefpostRoutes);
 
 //user routes
 app.use('/api/user', userRoutes);
+app.use('/api/predefine', predefineRoutes);
+
+
+
 app.use('/api/refunds', refundsRoutes);
 
   // Make sure this matches the controller
