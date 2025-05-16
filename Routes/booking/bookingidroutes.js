@@ -17,7 +17,10 @@ router.put('/status/:id', bookingController.updateBookingStatus);
 router.post('/refund', bookingController.handleRejection);
  router.get('/payment-details/:id', bookingController.getPaymentDetailsByBookingId);
 
-router.get('/total', bookingController.getTotalBookings);
+router.get('/total', bookingController.getBookingByMaidId);
+router.get('/all/status',bookingController.getStats)
+router.get('/bookings/maids/:id',bookingController.getBookingsByMaidId)
+router.get('/admin/earings/',bookingController.getTotalEarnings)
  console.log("Total Orders Route Hit");
 
 

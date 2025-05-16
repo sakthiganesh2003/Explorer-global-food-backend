@@ -1,5 +1,6 @@
 const Booking = require('../../Models/booking/bookingmodel');
 const User = require('../../Models/Users');
+const payment =require('../../Models/payment/payment')
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
@@ -397,12 +398,174 @@ exports.getPaymentDetailsByBookingId = async (req, res) => {
   }
 };
 
-exports.getTotalBookings = async (req, res) => {
- try {
-    const totalBookings = await Booking.countDocuments();
-    res.status(200).json({ totalBookings });
+// exports.getBookingByMaidId = async (req, res) => {
+//   try {
+//     const { maidId } = req.params;
+    
+//     // If maidId is 'total', return all bookings
+//     if (maidId === 'total') {
+//       const bookings = await Booking.find();
+//       return res.status(200).json({ bookings });
+//     }
+    
+//     // Otherwise, treat it as a normal ObjectId query
+//     const bookings = await Booking.find({ maidId });
+//     res.status(200).json({ bookings });
+//   } catch (error) {
+//     console.error('Error fetching bookings:', error);
+//     res.status(500).json({ message: 'Error fetching bookings', error: error.message });
+//   }
+// };
+
+exports.getStats = async (req, res) => {
+  try {
+    // User statistics by role
+    const totalChefs = await User.countDocuments({ role: 'chef' });
+    const totalMaids = await User.countDocuments({ role: 'maid' });
+    const totalRegularUsers = await User.countDocuments({ role: 'user' }); // or whatever your regular user role is called
+
+    // Booking status statistics
+    const confirmedBookings = await Booking.countDocuments({ status: 'confirmed' });
+    const cancelledBookings = await Booking.countDocuments({ status: 'cancelled' });
+    const collectedBookings = await Booking.countDocuments({ status: 'collected' });
+
+    res.status(200).json({
+      users: {
+        total: totalChefs + totalMaids + totalRegularUsers,
+        chefs: totalChefs,
+        maids: totalMaids,
+        users: totalRegularUsers
+      },
+      bookings: {
+        total: confirmedBookings + cancelledBookings + collectedBookings,
+        confirmed: confirmedBookings,
+        cancelled: cancelledBookings,
+        collected: collectedBookings
+      }
+    });
   } catch (error) {
-    console.error('Error fetching total bookings:', error);
-    res.status(500).json({ message: 'Error fetching total bookings', error: error.message });
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+exports.getBookingsByMaidId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(req.params);
+
+    // Validate maidId
+    if (!id) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Maid ID is required' 
+      });
+    }
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Maid ID format'
+      });
+    }
+
+    // Get all bookings for this maid with status breakdown
+    const stats = await Booking.aggregate([
+      {
+        $match: { maidId: new mongoose.Types.ObjectId(id) }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          confirmed: {
+            $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] }
+          },
+          cancelled: {
+            $sum: { $cond: [{ $eq: ["$status", "cancelled"] }, 1, 0] }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          total: 1,
+          confirmed: 1,
+          cancelled: 1
+        }
+      }
+    ]);
+
+    // If no bookings found
+    if (stats.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          total: 0,
+          confirmed: 0,
+          cancelled: 0
+        }
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: stats[0]
+    });
+
+  } catch (error) {
+    console.error('Error fetching maid booking stats:', error);
+
+    // Handle CastError for invalid ObjectId
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Maid ID format'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching maid bookings',
+      error: error.message
+    });
+  }
+};
+
+
+
+
+exports.getTotalEarnings = async (req, res) => {
+  try {
+    const result = await Booking.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$totalAmount" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          totalAmount: 1
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      totalAmount: result[0]?.totalAmount || 0
+    });
+
+  } catch (error) {
+    console.error('Error fetching total amount:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching total amount',
+      error: error.message
+    });
   }
 };

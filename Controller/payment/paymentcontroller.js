@@ -307,10 +307,154 @@ const verifyPayment = async (req, res) => {
 };
 
 
+const getpaymenthistory = async (req, res) => {
+try {
+    const { id } = req.params;
+
+    // Validate input
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing userId',
+        requiredFields: ['userId']
+      });
+    }
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid userId format',
+        errorCode: 'INVALID_ID'
+      });
+    }
+
+    // Find user
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND'
+      });
+    }
+
+    // Find bookings
+    const bookings = await Booking.find({ userId: id }, { _id: 1 }).lean();
+    if (bookings.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No bookings found for this user',
+        payments: []
+      });
+    }
+
+    const bookingIds = bookings.map(b => b._id);
+
+    // Find payments with pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const payments = await Payment.find({ bookingId: { $in: bookingIds } })
+      .populate('modeOfPaymentId')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment history retrieved successfully',
+      payments,
+      pagination: {
+        page,
+        limit,
+        total: payments.length
+      }
+    });
+  } catch (error) {
+    console.error('Get Payment History Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching payment history',
+      errorCode: 'SERVER_ERROR',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};  
+
+const getAllPaymentHistory = async (req, res) => {
+  try {
+    // Extract pagination parameters from query
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Validate pagination parameters
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid pagination parameters',
+        errorCode: 'INVALID_PAGINATION',
+      });
+    }
+
+    // Fetch payments with pagination and populate modeOfPaymentId
+    const payments = await Payment.find()
+      .populate('modeOfPaymentId')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Get total count for pagination
+    const total = await Payment.countDocuments();
+
+    // Check if payments exist
+    if (payments.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No payments found',
+        payments: [],
+        pagination: {
+          page,
+          limit,
+          total,
+        },
+      });
+    }
+
+    // Return successful response
+    res.status(200).json({
+      success: true,
+      message: 'Payment history retrieved successfully',
+      payments,
+      pagination: {
+        page,
+        limit,
+        total,
+      },
+    });
+  } catch (error) {
+    console.error('Get All Payment History Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching payment history',
+      errorCode: 'SERVER_ERROR',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+};
+
+
+
 
 
 // Export the functions and upload middleware
 module.exports = {
   initiatePayment,
   verifyPayment,
+  getpaymenthistory,
+  getAllPaymentHistory
 };
