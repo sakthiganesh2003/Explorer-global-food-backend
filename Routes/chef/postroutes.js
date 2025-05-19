@@ -20,4 +20,7 @@ router.put('/:id', recipeController.updateRecipe);
 // DELETE recipe by ID
 router.delete('/:id', recipeController.deleteRecipe);
 
+const { getchefpoststatus } = require('../../Controller/chef/postcontroller');
+router.get('/chef/status/:id', recipeController.getChefRecipesStatusById)
+
 module.exports = router;

@@ -160,7 +160,7 @@ exports.deleteBooking = async (req, res) => {
   }
 };
 
-// Update booking status (accept or reject)
+// Update booking status (confirmed or cancelled) and send email
 exports.updateBookingStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -569,3 +569,92 @@ exports.getTotalEarnings = async (req, res) => {
     });
   }
 };
+
+exports.getAllMaidEarnings = async (req, res) => {
+  try {
+    const pipeline = [
+      // Stage 1: Get all bookings (with optional date filtering)
+      {
+        $match: {
+          ...(req.query.startDate && { createdAt: { $gte: new Date(req.query.startDate) } }),
+          ...(req.query.endDate && { createdAt: { $lte: new Date(req.query.endDate) } })
+        }
+      },
+      
+      // Stage 2: Group by maidId to calculate earnings
+      {
+        $group: {
+          _id: "$maidId",
+          totalEarnings: { $sum: "$totalAmount" },
+          completedBookings: { 
+            $sum: { 
+              $cond: [{ $eq: ["$status", "completed"] }, 1, 0] 
+            } 
+          },
+          totalBookings: { $sum: 1 }
+        }
+      },
+      
+      // Stage 3: Right outer join with maids collection to include all maids
+      {
+        $lookup: {
+          from: "maids", // Make sure this matches your maid collection name
+          localField: "_id",
+          foreignField: "_id",
+          as: "maidDetails"
+        }
+      },
+      { $unwind: { path: "$maidDetails", preserveNullAndEmptyArrays: true } },
+      
+      // Stage 4: Project the final output
+      {
+        $project: {
+          maidId: "$_id",
+          maidName: {
+            $ifNull: [
+              { $concat: ["$maidDetails.firstName", " ", "$maidDetails.lastName"] },
+              "Unknown Maid"
+            ]
+          },
+          profileImage: "$maidDetails.profileImage",
+          totalEarnings: { $ifNull: [{ $round: ["$totalEarnings", 2] }, 0] },
+          completedBookings: { $ifNull: ["$completedBookings", 0] },
+          totalBookings: { $ifNull: ["$totalBookings", 0] },
+          _id: 0
+        }
+      },
+      
+      // Stage 5: Sort by highest earnings first
+      { $sort: { totalEarnings: -1 } }
+    ];
+
+    const result = await Booking.aggregate(pipeline);
+
+    // Alternative approach if still empty - get all maids with earnings
+    if (result.length === 0) {
+      const allMaids = await Maid.find({}, 'firstName lastName profileImage');
+      result = allMaids.map(maid => ({
+        maidId: maid._id,
+        maidName: `${maid.firstName} ${maid.lastName}`,
+        profileImage: maid.profileImage,
+        totalEarnings: 0,
+        completedBookings: 0,
+        totalBookings: 0
+      }));
+    }
+
+    res.status(200).json({
+      success: true,
+      count: result.length,
+      earnings: result
+    });
+
+  } catch (error) {
+    console.error('Error fetching maid earnings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching maid earnings',
+      error: error.message
+    });
+  }
+}

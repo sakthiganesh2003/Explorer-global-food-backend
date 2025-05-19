@@ -4,6 +4,8 @@ const cloudinary = require('../../Config/cloudinarys'); // Import configured Clo
 const multer = require('multer');
 const path = require('path');
 const mongoose = require('mongoose');
+const post = require('../../Models/chef/post');
+const User = require('../../Models/Users');
 
 // Configure Multer
 const storage = multer.memoryStorage(); // Store files in memory for streaming to Cloudinary
@@ -461,6 +463,51 @@ const deleteRecipe = async (req, res) => {
   }
 };
 
+
+const getChefRecipesStatusById = async (req, res) => {
+    try {
+        const { id: chefId } = req.params;
+
+        // Validate Chef ID
+        if (!chefId) {
+            return res.status(400).json({
+                success: false,
+                message: "Chef ID is required",
+            });
+        }
+
+        // Query the database for recipes and total count
+        const recipes = await Recipe.find({ chef: chefId }).select("_id status title recipe_name");
+        const totalRecipes = await Recipe.countDocuments({ chef: chefId });
+
+        // Group recipes by status
+        const statusCounts = {};
+        recipes.forEach((recipe) => {
+            const status = recipe.status || 'unknown'; // Fallback if status is undefined
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+        });
+
+        res.status(200).json({
+            success: true,
+            data: {
+                chefId,
+                totalRecipes,
+                recipes,
+                statusCounts,
+            },
+        });
+
+    } catch (error) {
+        console.error("[ERROR] getChefRecipesStatusById:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server error while fetching recipes",
+            error: process.env.NODE_ENV === "development" ? error.message : undefined,
+        });
+    }
+};
+
+
 // Export with Multer middleware for routes that handle file uploads
 module.exports = {
   createRecipe: [upload, handleMulterError, createRecipe],
@@ -469,4 +516,5 @@ module.exports = {
   getAllRecipes,
   updateRecipe: [upload, handleMulterError, updateRecipe],
   deleteRecipe,
+  getChefRecipesStatusById
 };

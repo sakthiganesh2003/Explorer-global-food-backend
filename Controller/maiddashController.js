@@ -46,7 +46,7 @@ const getMaidProfile = async (req, res) => {
         specialties: maid.specialties,
         rating: maid.rating,
         experience: maid.experience,
-        image: maid.image,
+        image:'chef1.jpg',
         isActive: maid.active,
         description: maid.description || 'Professional chef',
       },

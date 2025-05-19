@@ -21,6 +21,7 @@ router.get('/total', bookingController.getBookingByMaidId);
 router.get('/all/status',bookingController.getStats)
 router.get('/bookings/maids/:id',bookingController.getBookingsByMaidId)
 router.get('/admin/earings/',bookingController.getTotalEarnings)
+router.get('/maid/earings/',bookingController.getAllMaidEarnings )
  console.log("Total Orders Route Hit");
 
 

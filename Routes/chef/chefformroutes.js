@@ -1,7 +1,8 @@
 // Routes/chef/chefformroutes.js
 const express = require('express');
 const { upload } = require('../../Config/cloudinary');
-const { registerChef , getAllChefs , deleteChef } = require('../../Controller/chef/chefformcontroller');
+const { registerChef , getAllChefs , deleteChef  } = require('../../Controller/chef/chefformcontroller');
+const { getchefpoststatus } = require('../../Controller/chef/postcontroller');
 
 const router = express.Router();
 
@@ -15,5 +16,7 @@ router.post('/register', upload.single('certificationFile'), registerChef);
 
 // GET: Retrieve a chef by ID
 // router.get("/:id", getChefById);
+
+// router.get('/chef/status/:id', getchefpoststatus)
 
 module.exports = router;

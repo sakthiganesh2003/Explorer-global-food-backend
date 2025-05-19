@@ -1,9 +1,10 @@
 const Maid = require('../Models/formmaid');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2; // Use v2 explicitly
+const cloudinary = require('cloudinary').v2// Use v2 explicitly
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const dotenv = require ('dotenv');
+
 const path = require('path');
 const { timeout } = require('promise-timeout');
 
@@ -12,17 +13,18 @@ dotenv.config();
 const app = express();
 
 // Debug environment variables
-console.log('Environment Variables:', {
-  CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
-  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+console.log('Environment form Variables:', {
+  CLOUDINARY_NAME:process.env.CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY:process.env.CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET:process.env.CLOUDINARY_API_SECRET
 });
 
-// Configure Cloudinary
+
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name:'dn5igs95g',
+  api_key:'762879972736278',
+  api_secret:'XO6VXP-kY-DhaG8WXuE7U5hctag'
 });
 
 // Multer setup with memory storage
@@ -66,13 +68,13 @@ const validateInputs = (data) => {
 };
 
 // Controller: addformMaid
-const addformMaid = async (req, res) => {
+const   addformMaid = async (req, res) => {
   console.log('Received maid application:', req.body);
   console.log('Uploaded file:', req.file);
 
   try {
     // Validate Cloudinary configuration
-    if (!process.env.CLOUDINARY_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       return res.status(500).json({
         success: false,
         message: 'Cloudinary configuration is missing. Ensure CLOUDINARY_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET are set in .env'
@@ -81,7 +83,7 @@ const addformMaid = async (req, res) => {
 
     // Log Cloudinary configuration
     cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_NAME,
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
       api_secret: process.env.CLOUDINARY_API_SECRET
     });
