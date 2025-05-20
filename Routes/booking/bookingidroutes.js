@@ -11,6 +11,7 @@ router.get('/:id', bookingController.getBookingByMaidId);
 router.get('/user/:id', bookingController.getBookingByUserId);
 router.post('/', bookingController.createBooking);
 router.put('/:id', bookingController.updateBooking);
+
 router.delete('/:id', bookingController.deleteBooking);
 router.put('/status/:id', bookingController.updateBookingStatus);
 

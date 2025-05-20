@@ -39,6 +39,9 @@ const predefineRoutes = require('./Routes/user/predefine');
 
 const refundsRoutes = require('./Routes/booking/refundroutes');
 
+//feedback
+const feedbackRoutes = require('./Routes/user/feedback');
+
 // // Increase payload size limit 50MB 
 // app.use(bodyParser.json({ limit: '50mb' }));
 // app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -85,6 +88,11 @@ app.use('/api/predefine', predefineRoutes);
 
 
 app.use('/api/refunds', refundsRoutes);
+
+
+//feedback
+
+app.use('/api/feedback/',feedbackRoutes)
 
   // Make sure this matches the controller
 
