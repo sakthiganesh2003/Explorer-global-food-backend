@@ -1,24 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const maiddashController = require('../Controller/maiddashController');
-// const auth = require('../middleware/auth'); // Make sure this path is correct
+const { getMaidProfile, updateMaidProfile, toggleActiveStatus } = require('../Controller/maiddashController');
+const auth = require('../middleware/auth'); // Uncommented middleware
 
-// @route   GET api/maid-dashboard/profile
+// @route   GET api/maid/profile/:userId
 // @desc    Get maid profile
 // @access  Private
-router.get('/:id', maiddashController.getMaidProfile);
+router.get('/profile/:userId', auth, getMaidProfile);
 
-router.post('/profile', maiddashController.getMaidProfile);
-
-
-// @route   PUT api/maid-dashboard/profile
+// @route   PUT api/maid/profile
 // @desc    Update maid profile
 // @access  Private
-router.put('/profile',  maiddashController.updateMaidProfile);
+router.put('/profile/:id', auth, updateMaidProfile);
 
-// @route   PUT api/maid-dashboard/toggle-status
+// @route   PATCH api/maid/toggle-status
 // @desc    Toggle maid active status
 // @access  Private
-router.put('/toggle-status',  maiddashController.toggleActiveStatus);
+router.patch('/toggle-status', auth, toggleActiveStatus);
 
 module.exports = router;

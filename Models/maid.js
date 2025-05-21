@@ -15,6 +15,11 @@ const maidSchema = new mongoose.Schema({
       message: 'Invalid cuisine. Choose from: Italian, Mexican, Chinese, Indian, French, General'
     }
   },
+  location:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Location",
+    required:true,
+  },
   rating: { type: Number, required: true },
   experience: {
     type: String,

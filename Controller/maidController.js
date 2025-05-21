@@ -6,7 +6,8 @@ const { updateStatusMaid } = require("./formmaidController");
 // Fetch all maids
 const getMaids = async (req, res) => {
   try {
-    const maids = await Maid.find();
+    // Populate the 'location' field from the Maid schema
+    const maids = await Maid.find().populate('location');
     // Map maids to ensure userId is always present
     const formattedMaids = maids.map((maid) => ({
       ...maid.toObject(),

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createCountry,
   createState,
+  createtheCitys,
   createCategory,
   createProgrammingSkill,
   getAllCountries,
@@ -33,16 +34,17 @@ router.get('/states', getAllStates); // Get all states
 router.put('/states/:id', updateState); // Update a state
 router.delete('/states/:id', deleteState); // Delete a state
 
+
+
+//Routes for citys
+ router.post('/citys', createtheCitys);
+
+
 // Routes for Category
 router.post('/categories', createCategory);
 router.get('/categories', getAllCategories); // Get all categories
 router.put('/categories/:id', updateCategory); // Update a category
 router.delete('/categories/:id', deleteCategory); // Delete a category
 
-// Routes for Programming Skill
-router.post('/programmingSkills', createProgrammingSkill);
-router.get('/programmingSkills', getAllProgrammingSkills); // Get all programming skills
-router.put('/programmingSkills/:id', updateProgrammingSkill); // Update a programming skill
-router.delete('/programmingSkills/:id', deleteProgrammingSkill); // Delete a programming skill
 
 module.exports = router;

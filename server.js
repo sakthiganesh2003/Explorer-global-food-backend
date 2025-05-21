@@ -38,7 +38,7 @@ const userRoutes = require('./Routes/user/userprofileroutes');
 const predefineRoutes = require('./Routes/user/predefine'); 
 
 const refundsRoutes = require('./Routes/booking/refundroutes');
-
+const locationRoutes = require('./Routes/locationRoute')
 //feedback
 const feedbackRoutes = require('./Routes/user/feedback');
 
@@ -62,12 +62,16 @@ app.use(
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/maids", maidRoutes);
+//maid dash
 app.use('/api/maid', maidDashRoutes);
+
+
 app.use('/api/members', memberRoutes);
 app.use("/api/cuisine-types", cuisineTypeRoutes);
 app.use('/api/formMaids', formMaidRoutes);
 app.use("/api/time", timeSlotRoutes);
 app.use('/api/foods', foodRoutes);
+app.use('/api/locations',locationRoutes)
 // app.use('/api/booking', bookingRoutes);
 // app.use('/api/maids', selectMaidRouter);
 app.use('/api/bookings', bookingRoutes);

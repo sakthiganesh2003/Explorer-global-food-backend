@@ -1,4 +1,6 @@
-const { Country, State, Category, ProgrammingSkill } = require('../../Models/user/predefine');
+const { Country, State, Category, City } = require('../../Models/user/predefine');
+const mongoose = require('mongoose');
+// const Course = require('../../Models/user/course');
 
 // Create Country
 exports.createCountry = async (req, res) => {
@@ -34,6 +36,32 @@ exports.createState = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+exports.createtheCitys = async (req, res) => {
+  try {
+    const { name, order } = req.body;
+
+    // Validate input
+    if (!name || !order) {
+      return res.status(400).json({ error: 'Name and order are required' });
+    }
+
+    // Check if city already exists
+    const existingCity = await City.findOne({ name });
+    if (existingCity) {
+      return res.status(400).json({ error: 'City already exists' });
+    }
+
+    // Create and save the city
+    const city = new City({ name, order });
+    await city.save();
+
+    res.status(201).json(city);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 // Get States by Country ID
 exports.getStatesByCountryId = async (req, res) => {
   try {
@@ -64,25 +92,7 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-// Create Programming Skill
-exports.createProgrammingSkill = async (req, res) => {
-  try {
-    const { skillName, categoryId, order } = req.body;
-    if (!skillName || !categoryId || !order) {
-      return res.status(400).json({ error: 'SkillName, categoryId and order are required' });
-    }
-    // Validate categoryId
-    const category = await Category.findById(categoryId);
-    if (!category) {
-      return res.status(400).json({ error: 'Invalid categoryId' });
-    }
-    const programmingSkill = new ProgrammingSkill({ skillName, categoryId, order });
-    await programmingSkill.save();
-    res.status(201).json(programmingSkill);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+
 
 // Get all Countries
 exports.getAllCountries = async (req, res) => {

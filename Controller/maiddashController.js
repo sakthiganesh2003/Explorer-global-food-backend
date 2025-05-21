@@ -1,14 +1,16 @@
 const mongoose = require('mongoose');
 const Maid = require('../Models/maid');
+const Location = require('../Models/Location');
 const multer = require('multer');
-const fetch = require('node-fetch');
+const cloudinary = require('cloudinary').v2;
 
 // Configure multer for file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
 const getMaidProfile = async (req, res) => {
   try {
-    const userId = req.params;
+    const userId = req.params.userId; // Use JWT user ID
+    
     if (!userId) {
       return res.status(401).json({
         success: false,
@@ -16,7 +18,6 @@ const getMaidProfile = async (req, res) => {
       });
     }
 
-    console.log('Received userId:', userId);
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -27,7 +28,7 @@ const getMaidProfile = async (req, res) => {
     }
 
     const objectId = new mongoose.Types.ObjectId(userId);
-    const maid = await Maid.findOne({ userId: objectId });
+    const maid = await Maid.findOne({ userId: objectId }).populate('location', 'cityName pincode');
 
     if (!maid) {
       return res.status(404).json({
@@ -46,9 +47,11 @@ const getMaidProfile = async (req, res) => {
         specialties: maid.specialties,
         rating: maid.rating,
         experience: maid.experience,
-        image:'chef1.jpg',
+        image: maid.image || '/maid-default.jpg', // Updated default
         isActive: maid.active,
-        description: maid.description || 'Professional chef',
+        description: maid.description || 'Professional maid',
+        servicesLocation: maid.location?.cityName || '', // Map cityName to servicesLocation
+        pincode: maid.location?.pincode || '',
       },
     });
   } catch (error) {
@@ -63,7 +66,16 @@ const getMaidProfile = async (req, res) => {
 
 const updateMaidProfile = async (req, res) => {
   try {
-    const userId = req.user?.id;
+    console.log(req.params)
+    const userId = req.params.id; // Use JWT user ID
+    console.log(userId)
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized: No user found in request',
+      });
+    }
+
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -72,52 +84,112 @@ const updateMaidProfile = async (req, res) => {
     }
 
     // Validate required fields
-    const { fullName, specialties, rating, experience } = req.body;
-    if (!fullName || !specialties || !rating || !experience) {
+    const { fullName, specialties, rating, experience, description, servicesLocation, pincode } = req.body;
+    if (!fullName || !specialties || !rating || !experience || !servicesLocation || !pincode) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: fullName, specialties, rating, experience',
+        message: 'Missing required fields: fullName, specialties, rating, experience, servicesLocation, pincode',
       });
     }
 
-    // Handle image upload to Cloudinary
-    let imageUrl = req.body.image || 'https://res.cloudinary.com/default.jpg'; // Fallback image
-    if (req.file) {
-      const formData = new FormData();
-      formData.append('file', req.file.buffer.toString('base64'));
-      formData.append('upload_preset', process.env.CLOUDINARY_UPLOAD_PRESET);
+    // Sanitize inputs
+    const sanitizeHtml = require('sanitize-html');
+    const sanitizedFullName = sanitizeHtml(fullName);
+    const sanitizedDescription = sanitizeHtml(description || 'Professional maid');
 
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
-        { method: 'POST', body: formData }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Cloudinary upload failed');
-      }
-      imageUrl = data.secure_url;
+    // Validate specialties
+    if (typeof specialties !== 'string' || specialties.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Specialties must be a non-empty string',
+      });
+    }
+    const specialtiesArray = specialties.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    if (specialtiesArray.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one valid specialty is required',
+      });
     }
 
+    // Validate rating
+    const parsedRating = parseFloat(rating);
+    if (isNaN(parsedRating) || parsedRating < 0 || parsedRating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating must be a number between 0 and 5',
+      });
+    }
+
+    // Validate pincode (6-digit for India)
+    if (!/^\d{6}$/.test(pincode)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pincode must be a 6-digit number',
+      });
+    }
+
+    // Handle location: find or create
+    let locationDoc = await Location.findOne({ cityName: servicesLocation.trim(), pincode });
+    if (!locationDoc) {
+      locationDoc = await Location.create({ cityName: servicesLocation.trim(), pincode });
+    }
+
+    // Handle image upload to Cloudinary
+    let imageUrl = req.body.image || '/maid-default.jpg';
+    if (req.file) {
+      cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      });
+
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET },
+          (error, result) => {
+            if (error) return reject(new Error(error.message));
+            resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+      imageUrl = result.secure_url;
+    }
+
+    // Update or create profile
     const updatedMaid = await Maid.findOneAndUpdate(
       { userId: new mongoose.Types.ObjectId(userId) },
       {
         $set: {
-          fullName,
-          specialties: specialties.split(',').map(s => s.trim()), // Handle comma-separated specialties
-          rating: parseFloat(rating),
+          fullName: sanitizedFullName,
+          specialties: specialtiesArray,
+          rating: parsedRating,
           experience,
           image: imageUrl,
-          userId: new mongoose.Types.ObjectId(userId),
-          active: true, // Default for new profiles
-          description: req.body.description || 'Professional chef',
+          active: true,
+          description: sanitizedDescription,
+          location: locationDoc._id,
         },
       },
-      { new: true, runValidators: true, upsert: true } // Create if not exists
+      { new: true, runValidators: true, upsert: true }
     );
 
     return res.status(200).json({
       success: true,
-      data: updatedMaid,
+      data: {
+        id: updatedMaid._id.toString(),
+        userId: updatedMaid.userId.toString(),
+        fullName: updatedMaid.fullName,
+        specialties: updatedMaid.specialties,
+        rating: updatedMaid.rating,
+        experience: updatedMaid.experience,
+        image: updatedMaid.image,
+        isActive: updatedMaid.active,
+        description: updatedMaid.description,
+        servicesLocation: locationDoc.cityName,
+        pincode: locationDoc.pincode,
+      },
     });
   } catch (error) {
     console.error('Error updating/creating maid profile:', error);
@@ -169,6 +241,6 @@ const toggleActiveStatus = async (req, res) => {
 
 module.exports = {
   getMaidProfile,
-  updateMaidProfile: [upload.single('image'), updateMaidProfile], // Add multer middleware
+  updateMaidProfile: [upload.single('image'), updateMaidProfile],
   toggleActiveStatus,
 };

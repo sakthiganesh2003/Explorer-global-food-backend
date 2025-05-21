@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 // Country Model
@@ -22,6 +22,22 @@ const StateSchema = new Schema(
 );
 const State = mongoose.model('State', StateSchema);
 
+const citySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+    unique: true, // Ensures city names are globally unique
+  },
+  order: {
+    type: Number,
+    required: true,
+    min: 1,
+  },
+});
+
+const City = mongoose.model('City', citySchema);
+
 // Category Model
 const CategorySchema = new Schema(
   {
@@ -33,16 +49,6 @@ const CategorySchema = new Schema(
 );
 const Category = mongoose.model('Category', CategorySchema);
 
-// Programming Skills Model
-const ProgrammingSkillSchema = new Schema(
-  {
-    skillName: { type: String, required: true },
-    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, // Kept foreign key, renamed
-    // skillLevel: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], required: true },
-    order: { type: Number, required: true, min: 0 }
-  },
-  { timestamps: true }
-);
-const ProgrammingSkill = mongoose.model('ProgrammingSkill', ProgrammingSkillSchema);
 
-module.exports = { Country, State, Category, ProgrammingSkill };
+
+export { Country, State, Category, City };
