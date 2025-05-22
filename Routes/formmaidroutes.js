@@ -17,6 +17,7 @@ router.get('/', getformMaids);
 // router.delete('/', maidController.deleteMaids);
 // // Request body: { ids: ['id1', 'id2', 'id3'] }
 
+// PUT endpoint to update maid application status and create a Maid if approved
 router.put('/:id', async (req, res) => {
   try {
     // Validate the application ID
@@ -35,6 +36,7 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Maid application not found' });
     }
 
+    // If status is 'approved', create a new Maid
     if (req.body.status === 'approved') {
       try {
         // Ensure specialties is an array
@@ -44,8 +46,8 @@ router.put('/:id', async (req, res) => {
 
         // Normalize experience (remove " years" and ensure valid enum value)
         const experienceValue = application.experience
-          ? application.experience// Remove " years" suffix
-          : '0-1'; // Default value
+          ? application.experience.replace(' years', '') // Remove " years" suffix
+          : '0-1'; // Default value if experience is missing
 
         // Validate userId as ObjectId
         if (!mongoose.Types.ObjectId.isValid(application.userId)) {
@@ -55,18 +57,29 @@ router.put('/:id', async (req, res) => {
           });
         }
 
+        // Set location and pincode (use application data or defaults)
+        const locationValue = application.location || 'Unknown'; // Fallback if location is missing
+        const pincodeValue = application.pincode || null; // Set to null if optional, or provide a default
+
+        // Create new Maid instance
         const newMaid = new Maid({
           userId: application.userId, // Should be an ObjectId
           fullName: application.fullName,
           specialties: cuisines,
           rating: 0,
           experience: experienceValue, // Normalized value
-          image: application.image || 'default.jpg'
+          image: application.image || 'default.jpg',
+          location: locationValue, // Use application.location or default
+          pincode: pincodeValue // Use application.pincode or null (if optional)
         });
 
-        console.log('New Maid:', newMaid); // Debugging line
+        // Debugging: Log the newMaid object to inspect values
+        console.log('New Maid:', newMaid);
+
+        // Save the new Maid
         await newMaid.save();
 
+        // Return success response with updated application and new Maid
         return res.json({
           success: true,
           data: application,
@@ -82,6 +95,7 @@ router.put('/:id', async (req, res) => {
       }
     }
 
+    // If status is not 'approved', return updated application
     res.json({ success: true, data: application, message: 'Status updated successfully' });
   } catch (err) {
     console.error('Server error:', err);

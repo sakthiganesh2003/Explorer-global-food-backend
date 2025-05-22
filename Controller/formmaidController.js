@@ -38,12 +38,11 @@ const upload = multer({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Validation helper
 const validateInputs = (data) => {
   const errors = [];
 
   if (!data.userId) errors.push('User ID is required');
-  if (!data.fullName?.trim()) errors.push('Full name is required');
+  if (!data.fullName?.trim()) errors.push('Full name agent is required');
   if (!data.email?.trim()) errors.push('Email is required');
   if (!data.phone?.trim()) errors.push('Phone is required');
   if (!data.experience) errors.push('Experience is required');
@@ -53,6 +52,8 @@ const validateInputs = (data) => {
   if (!data.bio?.trim()) errors.push('Bio is required');
   if (!data.aadhaarNumber?.trim()) errors.push('Aadhaar number is required');
   if (!data.aadhaarPhoto) errors.push('Aadhaar photo is required');
+  if (!data.location) errors.push('Location is required');
+  if (!data.pincode?.trim()) errors.push('Pincode is required'); // Added pincode validation
   if (!data.bankDetails?.accountNumber?.trim()) errors.push('Bank account number is required');
   if (!data.bankDetails?.bankName?.trim()) errors.push('Bank name is required');
   if (!data.bankDetails?.ifscCode?.trim()) errors.push('IFSC code is required');
@@ -61,14 +62,14 @@ const validateInputs = (data) => {
   if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.push('Invalid email format');
   if (data.phone && !/^\d{10}$/.test(data.phone)) errors.push('Phone number must be 10 digits');
   if (data.aadhaarNumber && !/^\d{12}$/.test(data.aadhaarNumber)) errors.push('Aadhaar number must be 12 digits');
+  if (data.pincode && !/^\d{6}$/.test(data.pincode)) errors.push('Pincode must be 6 digits'); // Added pincode format validation
   if (data.bankDetails?.accountNumber && !/^\d{9,18}$/.test(data.bankDetails.accountNumber)) errors.push('Invalid bank account number');
   if (data.bankDetails?.ifscCode && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(data.bankDetails.ifscCode)) errors.push('Invalid IFSC code format');
 
   return errors;
 };
 
-// Controller: addformMaid
-const   addformMaid = async (req, res) => {
+const addformMaid = async (req, res) => {
   console.log('Received maid application:', req.body);
   console.log('Uploaded file:', req.file);
 
@@ -139,7 +140,7 @@ const   addformMaid = async (req, res) => {
     };
 
     try {
-      aadhaarPhotoUrl = await timeout(uploadToCloudinary(req.file.buffer), 30000); // 30-second timeout
+      aadhaarPhotoUrl = await timeout(uploadToCloudinary(req.file.buffer), 30000);
       console.log('Cloudinary upload result:', aadhaarPhotoUrl);
     } catch (uploadError) {
       console.error('Cloudinary upload failed:', uploadError);
@@ -163,6 +164,14 @@ const   addformMaid = async (req, res) => {
       }
     }
 
+    // Validate location ID
+    if (!mongoose.Types.ObjectId.isValid(req.body.location)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid location ID format'
+      });
+    }
+
     const maidData = {
       userId: req.body.userId,
       fullName: req.body.fullName,
@@ -172,6 +181,8 @@ const   addformMaid = async (req, res) => {
       specialties: specialties,
       bio: req.body.bio,
       aadhaarNumber: req.body.aadhaarNumber,
+      location: req.body.location,
+      pincode: req.body.pincode, // Added pincode
       bankDetails: {
         accountNumber: bankDetails.accountNumber,
         bankName: bankDetails.bankName,
@@ -233,7 +244,6 @@ const   addformMaid = async (req, res) => {
     });
   }
 };
-
 // Controller: getformMaids
 const getformMaids = async (req, res) => {
   try {

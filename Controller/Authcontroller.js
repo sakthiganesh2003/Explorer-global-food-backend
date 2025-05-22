@@ -211,7 +211,7 @@ const signup = async (req, res) => {
         await transporter.sendMail({
             from: `"Global food explore" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: "Verify Your Email - Smart Learning Hub",
+            subject: "Verify Your Email - Global food explore",
             html: emailVerificationTemplate(verificationUrl),
         });
 

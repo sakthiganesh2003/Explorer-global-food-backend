@@ -6,7 +6,7 @@ const emailVerificationTemplate = (verificationUrl) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Email Verification - AI SEO Hub</title>
+        <title>Email Verification - GLobal food explore</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -50,12 +50,12 @@ const emailVerificationTemplate = (verificationUrl) => {
       <body>
         <div class="container">
           <h2>Verify Your Email</h2>
-          <p>Thank you for signing up for <b>AI SEO Hub</b>. Please verify your email address by clicking the button below:</p>
+          <p>Thank you for signing up for <b>Global food expore</b>. Please verify your email address by clicking the button below:</p>
           <a href="${verificationUrl}" class="button">Verify Email</a>
           <p>If the button doesn't work, you can also click on this link:</p>
           <p><a href="${verificationUrl}">${verificationUrl}</a></p>
           <hr>
-          <p class="footer">If you did not sign up for AI SEO Hub, please ignore this email.</p>
+          <p class="footer">If you did not sign up for Global food explore, please ignore this email.</p>
         </div>
       </body>
       </html>
