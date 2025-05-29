@@ -62,6 +62,12 @@ exports.createtheCitys = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+exports.getallcity = async(req , res)=>{
+ 
+};
+
 // Get States by Country ID
 exports.getStatesByCountryId = async (req, res) => {
   try {

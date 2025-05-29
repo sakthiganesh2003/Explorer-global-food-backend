@@ -116,3 +116,34 @@ export const getAllFeedbacks= async (req, res) => {
     });
   }
 };
+
+// GET /api/feedback/by-id/:feedbackId
+export const getFeedbackByid = async (req, res) => {
+  try {
+    const { feedbackId } = req.params;
+
+    // Validate feedbackId
+    if (!feedbackId) {
+      return res.status(400).json({ error: 'Feedback ID is required' });
+    }
+
+    // Find feedback by ID
+    const feedback = await Feedback.findById(feedbackId);
+    if (!feedback) {
+      return res.status(404).json({ error: 'Feedback not found' });
+    }
+
+    // Optional: Authentication check (uncomment and adjust based on your auth mechanism)
+    
+    const userId = req.session?.userId; // Replace with your auth mechanism
+    if (!userId || feedback.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to view this feedback' });
+    }
+    
+
+    res.status(200).json(feedback);
+  } catch (error) {
+    console.error('Error retrieving feedback by ID:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

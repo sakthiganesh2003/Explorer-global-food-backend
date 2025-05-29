@@ -205,18 +205,27 @@ const addformMaid = async (req, res) => {
     }
 
     // Check for existing maid
-    const existingMaid = await Maid.findOne({
+    const existingEmail = await Maid.findOne({
       $or: [
         { email: maidData.email.toLowerCase() },
+      ]
+    });
+    const existingPhone = await Maid.findOne({
+      $or: [
         { phone: maidData.phone },
-        { aadhaarNumber: maidData.aadhaarNumber }
       ]
     });
 
-    if (existingMaid) {
+    if (existingEmail) {
       return res.status(409).json({
         success: false,
-        message: 'Maid with this email, phone, or Aadhaar number already exists'
+        message: 'Maid with this email, with already exists'
+      });
+    }
+    if (existingPhone) {
+      return res.status(409).json({
+        success: false,
+        message: 'Maid with this Phone, with already exists'
       });
     }
 
@@ -344,21 +353,33 @@ const updateStatusMaid = async (req, res) => {
         }
 
         // Check if maid already exists
-        const existingMaid = await Maid.findOne({
+        const existingEmail = await Maid.findOne({
           $or: [
             { email: updatedMaid.email.toLowerCase() },
-            { phone: updatedMaid.phone },
-            { aadhaarNumber: updatedMaid.aadhaarNumber }
           ],
           _id: { $ne: id } // Exclude the current maid
         });
+        const existingPhone = await Maid.findOne({
+          $or: [
+            { phone: updatedMaid.phone },
+          ],
+          _id: { $ne: id } // Exclude the current maid
+        });
+        
 
-        if (existingMaid) {
+        if (existingEmail) {
           return res.status(409).json({
             success: false,
-            message: 'Maid with this email, phone, or Aadhaar number already exists'
+            message: 'Maid with this email is already exist'
           });
         }
+        if (existingPhone) {
+          return res.status(409).json({
+            success: false,
+            message: 'Maid with this Phone is already'
+          });
+        }
+
 
         const newMaid = new Maid({
           userId: updatedMaid.userId,

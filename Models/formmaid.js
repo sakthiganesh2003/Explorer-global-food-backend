@@ -11,6 +11,12 @@ const maidSchema = new mongoose.Schema({
   bio: { type: String, required: true },
   aadhaarNumber: { type: String, required: true },
   aadhaarPhoto: { type: String, required: true },
+   location:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Location",
+      required:true,
+    },
+    pincode : {type:Number,required:true},
   bankDetails: {
     accountNumber: { type: String, required: true },
     bankName: { type: String, required: true },
@@ -18,5 +24,7 @@ const maidSchema = new mongoose.Schema({
     accountHolderName: { type: String, required: true }
   },
   status: { type: String, default: 'pending' }
+
+
 });
 module.exports = mongoose.model('FormMaid', maidSchema);

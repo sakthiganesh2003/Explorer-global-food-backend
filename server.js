@@ -41,6 +41,7 @@ const refundsRoutes = require('./Routes/booking/refundroutes');
 const locationRoutes = require('./Routes/locationRoute')
 //feedback
 const feedbackRoutes = require('./Routes/user/feedback');
+const profile= require('./Routes/user/profile');
 
 // // Increase payload size limit 50MB 
 // app.use(bodyParser.json({ limit: '50mb' }));
@@ -97,7 +98,7 @@ app.use('/api/refunds', refundsRoutes);
 //feedback
 
 app.use('/api/feedback/',feedbackRoutes)
-
+app.use('/api/profile', profile);
   // Make sure this matches the controller
 
 // MongoDB Connection

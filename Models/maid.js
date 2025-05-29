@@ -20,6 +20,7 @@ const maidSchema = new mongoose.Schema({
     ref:"Location",
     required:true,
   },
+  pincode: { type: String, required: true }, // Added pincode field
   rating: { type: Number, required: true },
   experience: {
     type: String,

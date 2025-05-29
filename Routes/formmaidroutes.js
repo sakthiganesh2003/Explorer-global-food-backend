@@ -19,6 +19,7 @@ router.get('/', getformMaids);
 
 // PUT endpoint to update maid application status and create a Maid if approved
 router.put('/:id', async (req, res) => {
+  console.log(req.body)
   try {
     // Validate the application ID
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -44,11 +45,6 @@ router.put('/:id', async (req, res) => {
           ? application.specialties
           : [application.specialties || 'General'];
 
-        // Normalize experience (remove " years" and ensure valid enum value)
-        const experienceValue = application.experience
-          ? application.experience.replace(' years', '') // Remove " years" suffix
-          : '0-1'; // Default value if experience is missing
-
         // Validate userId as ObjectId
         if (!mongoose.Types.ObjectId.isValid(application.userId)) {
           return res.status(400).json({
@@ -67,7 +63,7 @@ router.put('/:id', async (req, res) => {
           fullName: application.fullName,
           specialties: cuisines,
           rating: 0,
-          experience: experienceValue, // Normalized value
+          experience: application.experience, // Normalized value
           image: application.image || 'default.jpg',
           location: locationValue, // Use application.location or default
           pincode: pincodeValue // Use application.pincode or null (if optional)
