@@ -1,0 +1,16 @@
+[{
+  "_id": {
+    "$oid": "6800f900efbf03af96b758c1"
+  },
+  "id": "mode_of_payment_seq",
+  "reference_value": null,
+  "seq": 1066
+},
+{
+  "_id": {
+    "$oid": "6800f901efbf03af96b758c2"
+  },
+  "reference_value": null,
+  "id": "payment_seq",
+  "seq": 5076
+}]

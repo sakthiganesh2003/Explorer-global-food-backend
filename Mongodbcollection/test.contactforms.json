@@ -1,0 +1,84 @@
+[{
+  "_id": {
+    "$oid": "683942a7922354a407b5747d"
+  },
+  "name": "sakthi",
+  "email": "kasi@mailinator.com",
+  "message": "thekksljksssjjsljkkjl",
+  "status": "resolved",
+  "createdAt": {
+    "$date": "2025-05-30T05:31:19.970Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-30T05:39:02.244Z"
+  },
+  "__v": 0,
+  "adminNotes": ""
+},
+{
+  "_id": {
+    "$oid": "683944e8922354a407b57481"
+  },
+  "name": "sakthi",
+  "email": "kala1@mailinator.com",
+  "message": "jlkasjhjajaljkjakjkas",
+  "status": "resolved",
+  "createdAt": {
+    "$date": "2025-05-30T05:40:56.890Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-30T06:14:18.897Z"
+  },
+  "__v": 0,
+  "adminNotes": ""
+},
+{
+  "_id": {
+    "$oid": "683953ae922354a407b5752d"
+  },
+  "name": "sa",
+  "email": "babu@mailinator.com",
+  "message": "asaadssassas",
+  "status": "resolved",
+  "createdAt": {
+    "$date": "2025-05-30T06:43:58.923Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-30T06:44:14.547Z"
+  },
+  "__v": 0,
+  "adminNotes": ""
+},
+{
+  "_id": {
+    "$oid": "68395899922354a407b5768b"
+  },
+  "name": "John Doe",
+  "email": "babu@mailinator.com",
+  "message": "agsaaaafda",
+  "status": "resolved",
+  "createdAt": {
+    "$date": "2025-05-30T07:04:57.861Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-30T07:05:14.645Z"
+  },
+  "__v": 0,
+  "adminNotes": ""
+},
+{
+  "_id": {
+    "$oid": "683fdebd7a9ef8fa086e5ee9"
+  },
+  "name": "ss",
+  "email": "ss@gmail.com",
+  "message": "sdssdssdaaassa",
+  "status": "open",
+  "createdAt": {
+    "$date": "2025-06-04T05:50:53.413Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-04T05:50:53.413Z"
+  },
+  "__v": 0
+}]

@@ -1,0 +1,16 @@
+[{
+  "_id": {
+    "$oid": "682d866d93c94dbbb2343d78"
+  },
+  "cityName": "Madurai",
+  "pincode": "625003",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682d8c2a4634bcaefdf96570"
+  },
+  "cityName": "chennai",
+  "pincode": "625003",
+  "__v": 0
+}]

@@ -1,0 +1,34 @@
+[{
+  "_id": {
+    "$oid": "682c2571ada9a1e64f8d5479"
+  },
+  "bookingId": {
+    "$oid": "6822e1902f411dd43cca437c"
+  },
+  "userId": {
+    "$oid": "6822e1212f411dd43cca436f"
+  },
+  "rating": 4,
+  "comment": "The food was delicious, and the service was excellent!",
+  "createdAt": {
+    "$date": "2025-05-20T06:47:13.995Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682c26abada9a1e64f8d54c1"
+  },
+  "bookingId": {
+    "$oid": "6808cafc64a373a1e1e6d518"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "rating": 4,
+  "comment": "s",
+  "createdAt": {
+    "$date": "2025-05-20T06:52:27.790Z"
+  },
+  "__v": 0
+}]

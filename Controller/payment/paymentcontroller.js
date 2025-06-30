@@ -1,4 +1,4 @@
-const Booking = require('../../Models/booking/bookingmodel.js');
+const Booking = require('../../Models/booking/bookingmodel');
 const Razorpay = require('razorpay');
 const mongoose = require('mongoose');
 const { v2: cloudinary } = require('cloudinary');
@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const dotenv = require('dotenv');
 const User = require('../../Models/Users');
 const { Payment, ModeOfPayment } = require('../../Models/payment/payment.js');
+// const streamifier = require('streamifier');
 
 dotenv.config();
 
@@ -25,10 +26,11 @@ cloudinary.config({
 
 // Constants
 const MAX_RETRIES = 3;
-const UPLOAD_TIMEOUT_MS = 30000; // Increased to 30 seconds
+const UPLOAD_TIMEOUT_MS = 30000; // 30 seconds
 const RETRY_DELAY_MS = 2000; // 2-second delay between retries
+const MAX_PAYMENT_RETRIES = 3; // Maximum payment retry attempts
 
-// Retry Utility for Cloudinary Upload with Timeout and Delay
+// Retry Utility for Cloudinary Upload
 const streamUploadWithRetry = async (fileBuffer, retries = MAX_RETRIES, timeoutMs = UPLOAD_TIMEOUT_MS) => {
   let attempt = 0;
   while (attempt < retries) {
@@ -63,12 +65,12 @@ const streamUploadWithRetry = async (fileBuffer, retries = MAX_RETRIES, timeoutM
         throw new Error(`Cloudinary upload failed after ${retries} attempts: ${err.message}`);
       }
       console.warn(`Waiting ${RETRY_DELAY_MS}ms before retry ${attempt + 1}...`);
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS)); // Delay before retry
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
     }
   }
 };
 
-// Multer Config with File Size Limit
+// Multer Config
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
@@ -83,275 +85,485 @@ const getNextInstallmentNumber = async (bookingId) => {
   return lastPayment ? lastPayment.installmentNumber + 1 : 1;
 };
 
-// Payment Functions
-const initiatePayment = async (req, res) => {
+// Placeholder Notification Function
+const sendPaymentNotification = async (userId, payment) => {
   try {
-    const { bookingId } = req.body;
+    const user = await User.findById(userId);
+    if (!user) return;
 
-    if (!bookingId) {
+    const statusMessages = {
+      completed: 'Your payment was successful!',
+      failed: 'Your payment failed. Please try again.',
+      insufficient_funds: 'Insufficient funds. Please ensure your account has enough balance.',
+      declined: 'Your payment was declined by the bank. Please contact your bank.',
+      abandoned: 'Your payment was not completed. Please complete the payment.',
+      timeout: 'Your payment timed out. Please try again.',
+      error: 'An error occurred during payment processing. Please try again.',
+    };
+
+    console.log(`Notification to ${user.email}: ${statusMessages[payment.paymentStatus]}`, {
+      amount: payment.amount,
+      currency: payment.currency,
+      paymentId: payment.payId,
+      error: payment.errorDetails?.description,
+    });
+  } catch (error) {
+    console.error('Notification Error:', error);
+  }
+};
+
+// Initiate Payment
+const initiatePayment = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { userId, amount } = req.body;
+
+    if (!userId || !amount) {
+      await session.abortTransaction();
       return res.status(400).json({
         success: false,
-        message: "Missing bookingId",
-        requiredFields: ["bookingId"]
+        message: 'Missing userId or amount',
+        requiredFields: ['userId', 'amount'],
       });
     }
 
-    const booking = await Booking.findById(bookingId);
-    if (!booking) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid userId format',
+        errorCode: 'INVALID_ID',
+      });
+    }
+
+    const user = await User.findById(userId).session(session);
+    if (!user) {
+      await session.abortTransaction();
       return res.status(404).json({
         success: false,
-        message: "Booking not found",
-        errorCode: "BOOKING_NOT_FOUND"
+        message: 'User not found',
+        errorCode: 'USER_NOT_FOUND',
       });
     }
 
-    if (booking.status === 'cancelled') {
+    if (amount <= 0) {
+      await session.abortTransaction();
       return res.status(400).json({
         success: false,
-        message: "Cannot process payment for cancelled booking",
-        errorCode: "BOOKING_CANCELLED"
+        message: 'Amount must be positive',
+        errorCode: 'INVALID_AMOUNT',
       });
     }
 
-    const amount = booking.totalAmount;
-    const receiptId = `bk${bookingId.toString().slice(-12)}${Date.now().toString().slice(-6)}`;
+    const receiptId = `pay_${userId.toString().slice(-12)}${Date.now().toString().slice(-6)}`;
 
     const order = await razorpay.orders.create({
-      amount: Math.round(amount * 100), // Razorpay accepts the amount in paise (100 paise = 1 INR)
+      amount: Math.round(amount * 1), // Convert to paise
       currency: 'INR',
       receipt: receiptId,
       payment_capture: 1,
       notes: {
-        booking: bookingId.toString(),
-        type: 'full'
-      }
+        userId: userId.toString(),
+        type: 'full',
+      },
     });
 
-    await Booking.findByIdAndUpdate(bookingId, {
-      $set: { razorpayOrderId: order.id }
+    const modeOfPayment = new ModeOfPayment({
+      modeOfPayment: 'razorpay',
+      displayName: 'Razorpay',
+      bookingId: null, // No booking yet
+      details: {
+        gateway: 'razorpay',
+        orderId: order.id,
+        status: 'pending',
+      },
     });
 
-    // Generate the signature for verification
+    const payment = new Payment({
+      modeOfPaymentId: modeOfPayment._id,
+      bookingId: null, // No booking yet
+      amount,
+      currency: 'INR',
+      paymentStatus: 'pending',
+      paymentType: 'full',
+      payId: order.id, // Use order ID temporarily
+      razorpayOrderId: order.id,
+      recordedBy: userId,
+    });
+
+    await modeOfPayment.save({ session });
+    await payment.save({ session });
+
+    await session.commitTransaction();
+
     const generatedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(`${order.id}|${order.receipt}`)
+      .update(`${order.id}|${receiptId}`)
       .digest('hex');
 
     res.status(200).json({
       success: true,
       order,
-      signature: generatedSignature,  // Return the signature along with order details
-      currency: 'INR'
+      signature: generatedSignature,
+      paymentId: payment._id, // Return Payment document ID
+      currency: 'INR',
     });
   } catch (error) {
-    console.error("Payment initiation error:", error);
+    await session.abortTransaction();
+    console.error('Payment initiation error:', error);
     res.status(500).json({
       success: false,
-      message: "Payment initiation failed",
-      errorCode: "SERVER_ERROR",
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Payment initiation failed',
+      errorCode: 'SERVER_ERROR',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
+  } finally {
+    session.endSession();
   }
 };
 
+// Verify Payment
 const verifyPayment = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const { orderId, signature, paymentId, bookingId } = req.body;
+    const { orderId, signature, paymentId, razorpayPaymentId, userId } = req.body;
 
-    if (!orderId || !signature || !paymentId || !bookingId) {
+    if (!orderId || !signature || !paymentId || !razorpayPaymentId || !userId) {
       await session.abortTransaction();
       return res.status(400).json({
         success: false,
-        message: "Missing required fields",
-        errorCode: "MISSING_FIELDS",
-        requiredFields: ["orderId", "signature", "paymentId", "bookingId"]
+        message: 'Missing required fields',
+        errorCode: 'MISSING_FIELDS',
+        requiredFields: ['orderId', 'signature', 'paymentId', 'razorpayPaymentId', 'userId'],
       });
     }
 
-    // Log incoming data
-    console.log("Received Payload:", { orderId, paymentId, signature, bookingId });
+    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(paymentId)) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid userId or paymentId format',
+        errorCode: 'INVALID_ID',
+      });
+    }
 
-    // Generate signature
-    const data = `${orderId.trim()}|${paymentId.trim()}`;
+    const payment = await Payment.findById(paymentId).session(session);
+    if (!payment) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found',
+        errorCode: 'PAYMENT_NOT_FOUND',
+      });
+    }
+
+    const modeOfPayment = await ModeOfPayment.findById(payment.modeOfPaymentId).session(session);
+    if (!modeOfPayment) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        success: false,
+        message: 'Mode of payment not found',
+        errorCode: 'MODE_OF_PAYMENT_NOT_FOUND',
+      });
+    }
+
+    const data = `${orderId.trim()}|${razorpayPaymentId.trim()}`;
     const generatedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(data)
       .digest('hex');
 
-    const receivedSignature = signature.trim().toLowerCase();
-
-    // Log debugging info
-    console.log("Signature Generation Data:", data);
-    console.log("Order ID:", orderId.trim());
-    console.log("Payment ID:", paymentId.trim());
-    console.log("Received Signature:", receivedSignature);
-    console.log("Generated Signature:", generatedSignature);
-    console.log("RAZORPAY_KEY_SECRET (partial):", process.env.RAZORPAY_KEY_SECRET.slice(0, 4) + '...');
-
-    if (generatedSignature !== receivedSignature) {
-      await session.abortTransaction();
+    if (generatedSignature !== signature.trim().toLowerCase()) {
+      payment.paymentStatus = 'failed';
+      payment.errorDetails = {
+        code: 'INVALID_SIGNATURE',
+        description: 'Payment signature verification failed',
+        source: 'gateway',
+        step: 'verification',
+      };
+      payment.failedAt = new Date();
+      modeOfPayment.details.status = 'failed';
+      modeOfPayment.details.errorCode = 'INVALID_SIGNATURE';
+      modeOfPayment.details.errorDescription = 'Payment signature verification failed';
+      await payment.save({ session });
+      await modeOfPayment.save({ session });
+      await session.commitTransaction();
       return res.status(400).json({
         success: false,
-        message: "Invalid payment signature",
-        errorCode: "INVALID_SIGNATURE",
-        debug: {
-          orderId: orderId.trim(),
-          paymentId: paymentId.trim(),
-          receivedSignature,
-          generatedSignature,
-          dataUsed: data
-        }
+        message: 'Invalid payment signature',
+        errorCode: 'INVALID_SIGNATURE',
+        debug: { orderId, razorpayPaymentId, receivedSignature: signature, generatedSignature },
       });
     }
 
-    // Find the booking
-    const booking = await Booking.findById(bookingId).session(session);
-    if (!booking) {
-      await session.abortTransaction();
-      return res.status(404).json({
-        success: false,
-        message: "Booking not found",
-        errorCode: "BOOKING_NOT_FOUND"
-      });
-    }
-
-    // Fetch payment details from Razorpay
     let razorpayPayment;
     try {
-      razorpayPayment = await razorpay.payments.fetch(paymentId);
-      console.log("Fetched Razorpay Payment Details:", razorpayPayment);
+      razorpayPayment = await razorpay.payments.fetch(razorpayPaymentId);
+      console.log('Razorpay Payment Response:', razorpayPayment); // Debug log
     } catch (err) {
-      await session.abortTransaction();
-      console.error("Razorpay Fetch Error:", err);
+      payment.paymentStatus = 'failed';
+      payment.errorDetails = {
+        code: err.error?.code || 'FETCH_FAILED',
+        description: err.error?.description || 'Failed to fetch payment',
+        source: 'gateway',
+        step: 'fetch',
+      };
+      payment.failedAt = new Date();
+      modeOfPayment.details.status = 'failed';
+      modeOfPayment.details.errorCode = err.error?.code || 'FETCH_FAILED';
+      modeOfPayment.details.errorDescription = err.error?.description || 'Failed to fetch payment';
+      await payment.save({ session });
+      await modeOfPayment.save({ session });
+      await session.commitTransaction();
       return res.status(400).json({
         success: false,
-        message: "Invalid or non-existent payment ID",
-        errorCode: "RAZORPAY_FETCH_FAILED",
-        razorpayError: err.error || err.message
+        message: 'Invalid payment ID',
+        errorCode: 'RAZORPAY_FETCH_FAILED',
+        error: err.error || err.message,
       });
     }
 
-    // Check if the payment is captured
-    if (razorpayPayment.status !== 'captured') {
-      await session.abortTransaction();
-      return res.status(400).json({
-        success: false,
-        message: `Payment not completed. Status: ${razorpayPayment.status}`,
-        errorCode: "PAYMENT_NOT_CAPTURED",
-        paymentDetails: razorpayPayment
-      });
+    let paymentStatus = 'failed';
+    let errorDetails = {};
+    let modeDetails = {
+      gateway: 'razorpay',
+      orderId,
+      paymentId: razorpayPaymentId,
+      method: razorpayPayment.method,
+      bank: razorpayPayment.bank || null,
+      wallet: razorpayPayment.wallet || null,
+      status: razorpayPayment.status,
+    };
+
+    switch (razorpayPayment.status) {
+      case 'captured':
+        paymentStatus = 'completed';
+        // Validate captured_at before setting
+        if (razorpayPayment.captured_at && !isNaN(razorpayPayment.captured_at)) {
+          modeDetails.capturedAt = new Date(razorpayPayment.captured_at * 1000);
+        } else {
+          console.warn('Captured_at is invalid or missing:', razorpayPayment.captured_at);
+          modeDetails.capturedAt = null; // Set to null if invalid
+        }
+        break;
+      case 'failed':
+        paymentStatus = razorpayPayment.error_code?.includes('INSUFFICIENT_FUNDS')
+          ? 'insufficient_funds'
+          : razorpayPayment.error_code?.includes('DECLINED')
+          ? 'declined'
+          : 'failed';
+        errorDetails = {
+          code: razorpayPayment.error_code || 'UNKNOWN',
+          description: razorpayPayment.error_description || 'Payment failed',
+          source: razorpayPayment.error_source || 'unknown',
+          step: razorpayPayment.error_step || 'unknown',
+        };
+        modeDetails.errorCode = razorpayPayment.error_code;
+        modeDetails.errorDescription = razorpayPayment.error_description;
+        break;
+      case 'created':
+      case 'authorized':
+        paymentStatus = 'abandoned';
+        break;
+      default:
+        paymentStatus = 'error';
+        errorDetails = {
+          code: 'UNKNOWN_STATUS',
+          description: `Unexpected payment status: ${razorpayPayment.status}`,
+          source: 'gateway',
+          step: 'verification',
+        };
+        modeDetails.errorCode = 'UNKNOWN_STATUS';
+        modeDetails.errorDescription = `Unexpected payment status: ${razorpayPayment.status}`;
+        break;
     }
 
-    // Create mode of payment and payment record
-    const modeOfPayment = new ModeOfPayment({
-      modeOfPayment: 'razorpay',
-      displayName: 'Razorpay',
-      bookingId: booking._id,
-      details: {
-        gateway: 'razorpay',
-        orderId,
-        paymentId,
-        method: razorpayPayment.method,
-        bank: razorpayPayment.bank || null,
-        wallet: razorpayPayment.wallet || null,
-        status: razorpayPayment.status,
-        capturedAt: new Date(razorpayPayment.captured_at * 1000)
-      }
-    });
+    payment.paymentStatus = paymentStatus;
+    payment.errorDetails = paymentStatus !== 'completed' ? errorDetails : undefined;
+    payment.failedAt = paymentStatus !== 'completed' ? new Date() : undefined;
+    payment.completedAt = paymentStatus === 'completed' ? new Date() : undefined;
+    payment.razorpayPaymentId = razorpayPaymentId;
+    payment.razorpaySignature = signature;
+    payment.customerResponse = razorpayPayment;
+    payment.payId = razorpayPaymentId; // Update payId to actual payment ID
+    payment.retryCount = paymentStatus !== 'completed' ? payment.retryCount + 1 : payment.retryCount;
 
-    const payment = new Payment({
-      modeOfPaymentId: modeOfPayment._id,
-      bookingId: booking._id,
-      amount: booking.totalAmount,
-      currency: 'INR',
-      paymentStatus: 'completed',
-      paymentType: 'full',
-      payId: paymentId,
-      customerResponse: razorpayPayment,
-      isPartial: false,
-      completedAt: new Date()
-    });
+    modeOfPayment.details = modeDetails;
 
-    // Update booking status
-    booking.status = 'pending';
-    booking.razorpayOrderId = undefined;
-
-    // Save transaction data
-    await modeOfPayment.save({ session });
     await payment.save({ session });
-    await booking.save({ session });
+    await modeOfPayment.save({ session });
 
     await session.commitTransaction();
-    return res.status(200).json({
-      success: true,
-      message: "Full payment verified and recorded",
+
+    await sendPaymentNotification(userId, payment);
+
+    return res.status(paymentStatus === 'completed' ? 200 : 400).json({
+      success: paymentStatus === 'completed',
+      message: `Payment ${paymentStatus}`,
       payment,
-      booking
     });
   } catch (error) {
     await session.abortTransaction();
-    console.error("Verify Payment Error:", error);
+    console.error('Verify Payment Error:', error);
     return res.status(500).json({
       success: false,
-      message: "Server error during payment verification",
-      errorCode: "SERVER_ERROR",
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Server error during payment verification',
+      errorCode: 'SERVER_ERROR',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   } finally {
     session.endSession();
   }
-  
 };
 
+// Retry Payment
+const retryPayment = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
+  try {
+    const { paymentId, userId } = req.body;
+
+    if (!paymentId || !userId) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields',
+        requiredFields: ['paymentId', 'userId'],
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(paymentId) || !mongoose.Types.ObjectId.isValid(userId)) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid paymentId or userId format',
+        errorCode: 'INVALID_ID',
+      });
+    }
+
+    const payment = await Payment.findById(paymentId).session(session);
+    if (!payment) {
+      await session.abortTransaction();
+      return res.status(404).json({
+        success: false,
+        message: 'Payment record not found',
+        errorCode: 'PAYMENT_NOT_FOUND',
+      });
+    }
+
+    if (payment.retryCount >= MAX_PAYMENT_RETRIES) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum retry attempts exceeded',
+        errorCode: 'MAX_RETRIES_EXCEEDED',
+      });
+    }
+
+    if (!payment.isFailed || !payment.canRetry) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        success: false,
+        message: 'Payment is not eligible for retry',
+        errorCode: 'INVALID_RETRY',
+      });
+    }
+
+    const amount = payment.amount;
+    const receiptId = `pay_${userId.toString().slice(-12)}${Date.now().toString().slice(-6)}`;
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount * 1),
+      currency: 'INR',
+      receipt: receiptId,
+      payment_capture: 1,
+      notes: {
+        userId: userId.toString(),
+        type: 'full',
+      },
+    });
+
+    payment.razorpayOrderId = order.id;
+    payment.paymentStatus = 'pending';
+    payment.errorDetails = undefined;
+    payment.payId = order.id; // Update payId temporarily
+    const modeOfPayment = await ModeOfPayment.findById(payment.modeOfPaymentId).session(session);
+    modeOfPayment.details.orderId = order.id;
+    modeOfPayment.details.status = 'pending';
+    modeOfPayment.details.errorCode = undefined;
+    modeOfPayment.details.errorDescription = undefined;
+
+    await payment.save({ session });
+    await modeOfPayment.save({ session });
+
+    await session.commitTransaction();
+
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${order.id}|${receiptId}`)
+      .digest('hex');
+
+    await sendPaymentNotification(userId, payment);
+
+    res.status(200).json({
+      success: true,
+      order,
+      signature: generatedSignature,
+      paymentId: payment._id,
+      currency: 'INR',
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    console.error('Retry Payment Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during payment retry',
+      errorCode: 'SERVER_ERROR',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  } finally {
+    session.endSession();
+  }
+};
+
+// Get Payment History for a User
 const getpaymenthistory = async (req, res) => {
-try {
+  try {
     const { id } = req.params;
 
-    // Validate input
     if (!id) {
       return res.status(400).json({
         success: false,
         message: 'Missing userId',
-        requiredFields: ['userId']
+        requiredFields: ['userId'],
       });
     }
 
-    // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid userId format',
-        errorCode: 'INVALID_ID'
+        errorCode: 'INVALID_ID',
       });
     }
 
-    // Find user
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
-        errorCode: 'USER_NOT_FOUND'
+        errorCode: 'USER_NOT_FOUND',
       });
     }
 
-    // Find bookings
     const bookings = await Booking.find({ userId: id }, { _id: 1 }).lean();
-    if (bookings.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: 'No bookings found for this user',
-        payments: []
-      });
-    }
-
     const bookingIds = bookings.map(b => b._id);
 
-    // Find payments with pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -363,69 +575,20 @@ try {
       .limit(limit)
       .lean();
 
-    res.status(200).json({
-      success: true,
-      message: 'Payment history retrieved successfully',
-      payments,
-      pagination: {
-        page,
-        limit,
-        total: payments.length
-      }
+    const total = await Payment.countDocuments({ bookingId: { $in: bookingIds } });
+    const completed = await Payment.countDocuments({
+      bookingId: { $in: bookingIds },
+      paymentStatus: 'completed',
     });
-  } catch (error) {
-    console.error('Get Payment History Error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching payment history',
-      errorCode: 'SERVER_ERROR',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    const failed = await Payment.countDocuments({
+      bookingId: { $in: bookingIds },
+      paymentStatus: { $in: ['failed', 'insufficient_funds', 'declined', 'timeout', 'error'] },
     });
-  }
-};  
+    const abandoned = await Payment.countDocuments({
+      bookingId: { $in: bookingIds },
+      paymentStatus: 'abandoned',
+    });
 
-const getAllPaymentHistory = async (req, res) => {
-  try {
-    // Extract pagination parameters from query
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    // Validate pagination parameters
-    if (page < 1 || limit < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid pagination parameters',
-        errorCode: 'INVALID_PAGINATION',
-      });
-    }
-
-    // Fetch payments with pagination and populate modeOfPaymentId
-    const payments = await Payment.find()
-      .populate('modeOfPaymentId')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    // Get total count for pagination
-    const total = await Payment.countDocuments();
-
-    // Check if payments exist
-    if (payments.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: 'No payments found',
-        payments: [],
-        pagination: {
-          page,
-          limit,
-          total,
-        },
-      });
-    }
-
-    // Return successful response
     res.status(200).json({
       success: true,
       message: 'Payment history retrieved successfully',
@@ -434,6 +597,68 @@ const getAllPaymentHistory = async (req, res) => {
         page,
         limit,
         total,
+      },
+      paymentSummary: {
+        totalPayments: total,
+        completed,
+        failed,
+        abandoned,
+      },
+    });
+  } catch (error) {
+    console.error('Get Payment History Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching payment history',
+      errorCode: 'SERVER_ERROR',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+};
+
+// Get All Payment History
+const getAllPaymentHistory = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid pagination parameters',
+        errorCode: 'INVALID_PAGINATION',
+      });
+    }
+
+    const payments = await Payment.find()
+      .populate('modeOfPaymentId')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await Payment.countDocuments();
+    const completed = await Payment.countDocuments({ paymentStatus: 'completed' });
+    const failed = await Payment.countDocuments({
+      paymentStatus: { $in: ['failed', 'insufficient_funds', 'declined', 'timeout', 'error'] },
+    });
+    const abandoned = await Payment.countDocuments({ paymentStatus: 'abandoned' });
+
+    res.status(200).json({
+      success: true,
+      message: payments.length ? 'Payment history retrieved successfully' : 'No payments found',
+      payments,
+      pagination: {
+        page,
+        limit,
+        total,
+      },
+      paymentSummary: {
+        totalPayments: total,
+        completed,
+        failed,
+        abandoned,
       },
     });
   } catch (error) {
@@ -447,14 +672,12 @@ const getAllPaymentHistory = async (req, res) => {
   }
 };
 
-
-
-
-
-// Export the functions and upload middleware
+// Export Functions and Middleware
 module.exports = {
   initiatePayment,
   verifyPayment,
+  retryPayment,
   getpaymenthistory,
-  getAllPaymentHistory
+  getAllPaymentHistory,
+  upload,
 };

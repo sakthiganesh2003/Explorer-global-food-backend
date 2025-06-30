@@ -1,0 +1,665 @@
+[{
+  "_id": {
+    "$oid": "67e54a333558528976742f5e"
+  },
+  "fullName": "Priya Sharma",
+  "email": "priya.sharma@example.com",
+  "phone": "+91 9876543210",
+  "experience": "5 years",
+  "specialties": [
+    "Indian Cuisine",
+    "House Cleaning"
+  ],
+  "bio": "Passionate cook and experienced housekeeper.",
+  "availability": [
+    "Monday",
+    "Wednesday",
+    "Friday"
+  ],
+  "aadhaarPhoto": "https://example.com/aadhaar.jpg",
+  "aadhaarNumber": "1234-5678-9012",
+  "__v": 0,
+  "status": "approved"
+},
+{
+  "_id": {
+    "$oid": "67ee2190fab2fc019c6d60bf"
+  },
+  "fullName": "kathirbaimaidnew",
+  "userId": {
+    "$oid": "67ed078fbcc229aff72631bd"
+  },
+  "email": "sakthiganesh451@gmail.com",
+  "phone": "1122334551",
+  "experience": "1-3 years",
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "asdfasd",
+  "aadhaarPhoto": "https://storage.example.com/aadhaar/2.png-1743659408536",
+  "aadhaarNumber": "233234444434",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "createdAt": {
+    "$date": "2025-04-03T05:50:08.629Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67ee7ab50602412a0fe1b48d"
+  },
+  "fullName": "kala",
+  "userId": {
+    "$oid": "67ee76090602412a0fe1b485"
+  },
+  "email": "fooduser@mailinator.com",
+  "phone": "0987635215",
+  "experience": "1-3 years",
+  "specialties": [
+    "Italian",
+    "Indian"
+  ],
+  "bio": "asda",
+  "aadhaarPhoto": "https://storage.example.com/aadhaar/2.png-1743682229754",
+  "aadhaarNumber": "233234444430",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "baalji"
+  },
+  "status": "approved",
+  "createdAt": {
+    "$date": "2025-04-03T12:10:29.881Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f509fc0d6b22fd59e244da"
+  },
+  "fullName": "kathirbai",
+  "userId": {
+    "$oid": "67e392bfe7a0eb0ae78899d2"
+  },
+  "email": "userfood@mailinator.com",
+  "phone": "0987635213",
+  "experience": "1-3 years",
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "jhhjhhhhjj",
+  "aadhaarPhoto": "https://storage.example.com/aadhaar/2.png-1744112124800",
+  "aadhaarNumber": "233234444499",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "createdAt": {
+    "$date": "2025-04-08T11:35:24.904Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f764b1583e01334a38329c"
+  },
+  "userId": "12345",
+  "fullName": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "phone": "9876543210",
+  "experience": "5 years",
+  "specialties": [
+    "cooking",
+    "cleaning"
+  ],
+  "bio": "Experienced maid with a passion for cleanliness",
+  "aadhaarNumber": "123456789012",
+  "aadhaarPhoto": "base64stringOrUrl",
+  "bankDetails": {
+    "accountNumber": "123456789012",
+    "bankName": "State Bank",
+    "ifscCode": "SBIN0001234",
+    "accountHolderName": "Jane Doe"
+  },
+  "status": "approved",
+  "createdAt": {
+    "$date": "2025-04-10T06:26:57.421Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f77b44df327453851117f4"
+  },
+  "fullName": "kathir",
+  "userId": {
+    "$oid": "67f7614fd6c443f62fb8d966"
+  },
+  "email": "saga2@gmail.com",
+  "phone": "0987635218",
+  "experience": "0-1 years",
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "eggf",
+  "aadhaarPhoto": "add.jpg",
+  "aadhaarNumber": "233234444422",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "createdAt": {
+    "$date": "2025-04-10T08:03:16.798Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f795c40ac0f2777f59b47b"
+  },
+  "fullName": "kathir",
+  "userId": {
+    "$oid": "67f7614fd6c443f62fb8d965"
+  },
+  "email": "saga4@gmail.com",
+  "phone": "0987635223",
+  "experience": "0-1 years",
+  "specialties": [
+    "[\"Indian\"",
+    "\"Italian\"]"
+  ],
+  "bio": "eggf",
+  "aadhaarPhoto": "add.jpg",
+  "aadhaarNumber": "233234444454",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "createdAt": {
+    "$date": "2025-04-10T09:56:20.384Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f79f9fa771295084b043d4"
+  },
+  "fullName": "kathir",
+  "userId": {
+    "$oid": "67f7614fd6c443f62fb8d965"
+  },
+  "email": "saga8@gmail.com",
+  "phone": "0987635000",
+  "experience": "0-1 years",
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "eggf",
+  "aadhaarPhoto": "add.jpg",
+  "aadhaarNumber": "233234444423",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "createdAt": {
+    "$date": "2025-04-10T10:38:23.099Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f7b0522349c6d983285e2a"
+  },
+  "userId": "67f7614fd6c443f62fb8d966",
+  "fullName": "balaji",
+  "email": "kathirkala@mailinator.com",
+  "phone": "1234567890",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744285777/maid_aadhaar/ggxtl8qwagaevb66ux0y.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "style",
+  "aadhaarNumber": "123456789230",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744285777/maid_aadhaar/ggxtl8qwagaevb66ux0y.png",
+  "bankDetails": {
+    "accountNumber": "12345678912",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "baalji"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f7b2765e43faae34dad610"
+  },
+  "userId": "67f7614fd6c443f62fb8d966",
+  "fullName": "pandian",
+  "email": "pandian@gmail.com",
+  "phone": "1234567866",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744286325/maid_aadhaar/u6rbjropsn8af7mithnq.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "style",
+  "aadhaarNumber": "123456789056",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744286325/maid_aadhaar/u6rbjropsn8af7mithnq.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f7b3da5e43faae34dad640"
+  },
+  "userId": "67f7614fd6c443f62fb8d966",
+  "fullName": "pandian",
+  "email": "sakthiganesh80398@gmail.com",
+  "phone": "9944085573",
+  "experience": "1-3 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744286681/maid_aadhaar/fu3vfg0o8lpxjjo7ytgb.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "sdfasdfa",
+  "aadhaarNumber": "123456789009",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744286681/maid_aadhaar/fu3vfg0o8lpxjjo7ytgb.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f7b56f9fef61be3dcd0070"
+  },
+  "userId": "67f7614fd6c443f62fb8d966",
+  "fullName": "bottle",
+  "email": "bottle@mailinator.com",
+  "phone": "1234567845",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744287086/maid_aadhaar/od4flyjiurqssxvs7cos.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "style",
+  "aadhaarNumber": "123456789045",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744287086/maid_aadhaar/od4flyjiurqssxvs7cos.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f7b6955ae09a8cc643fc1a"
+  },
+  "userId": "67f7614fd6c443f62fb8d966",
+  "fullName": "doe",
+  "email": "doe@gmail.com",
+  "phone": "1234567989",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744287380/maid_aadhaar/kruibnwm1imw6ubfi1wu.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "styles",
+  "aadhaarNumber": "123456789034",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744287380/maid_aadhaar/kruibnwm1imw6ubfi1wu.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "baalji"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f7b796cfe01e30cc6ea940"
+  },
+  "userId": "67f7614fd6c443f62fb8d966",
+  "fullName": "ninja",
+  "email": "sakthiganesh4511@gmail.com",
+  "phone": "1234567690",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744287637/maid_aadhaar/sgty8xrywrs1npl4iej6.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "styles",
+  "aadhaarNumber": "123456789054",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1744287637/maid_aadhaar/sgty8xrywrs1npl4iej6.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680b3f795543bfa87bf9367f"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "vikrammaid",
+  "email": "vik@mailinator.com",
+  "phone": "3245780944",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745567609/maid_aadhaar/dpnu3cwdnadoqwpmi0vs.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Japanese"
+  ],
+  "bio": "asdsd",
+  "aadhaarNumber": "233234444898",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745567609/maid_aadhaar/dpnu3cwdnadoqwpmi0vs.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680b42a7349d4c23c117dca7"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "kala1",
+  "email": "kala1@mailinator.com",
+  "phone": "1234567899",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745568422/maid_aadhaar/epvo5adl0a4t9xqm5tp1.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Japanese"
+  ],
+  "bio": "aa",
+  "aadhaarNumber": "233234444411",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745568422/maid_aadhaar/epvo5adl0a4t9xqm5tp1.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "rejected",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680b4917db84e4c6b0e2a28a"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "ad",
+  "email": "kala2@mailinator.com",
+  "phone": "1234567822",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745570071/maid_aadhaar/ujna9rawvue5nttajjlz.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Japanese"
+  ],
+  "bio": "444",
+  "aadhaarNumber": "233234444444",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745570071/maid_aadhaar/ujna9rawvue5nttajjlz.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "state bank",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680b61fe0449248c7672043e"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "ads",
+  "email": "adqs@mailinator.com",
+  "phone": "1234567555",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745576446/maid_aadhaar/ashcaxw3syx4y41tbpny.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "asdg",
+  "aadhaarNumber": "233234444490",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745576446/maid_aadhaar/ashcaxw3syx4y41tbpny.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680b6305276ae95c4f748c03"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "adssss",
+  "email": "baddsss@mailinator.com",
+  "phone": "1234567823",
+  "experience": "1-3 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745576709/maid_aadhaar/adclenlnh77gbz4hlraf.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "we",
+  "aadhaarNumber": "233234444455",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745576709/maid_aadhaar/adclenlnh77gbz4hlraf.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "681078ae597e1e6b0f7f22da"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "maid1",
+  "email": "sakthiganesh45122@gmail.com",
+  "phone": "1122334111",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745909934/maid_aadhaar/uiplj3pijx5lgsbqjgbq.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "ss",
+  "aadhaarNumber": "233234444486",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745909934/maid_aadhaar/uiplj3pijx5lgsbqjgbq.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "state bank",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68107ead53c2db94a5d79207"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "kalamaid2",
+  "email": "sakthiganesh80982@gmail.com",
+  "phone": "1234567446",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745911468/maid_aadhaar/ko6wi2g14kplzzbvkl7x.png",
+  "rating": 0,
+  "specialties": [
+    "Indian",
+    "Italian"
+  ],
+  "bio": "fdgd",
+  "aadhaarNumber": "233234444222",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1745911468/maid_aadhaar/ko6wi2g14kplzzbvkl7x.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "state bank",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682b05e5361005faaeb18515"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "maid3",
+  "email": "maid3@mailinator.com",
+  "phone": "1234567444",
+  "experience": "1-3 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1747650020/maid_aadhaar/fpp2ndwcre9hj1gaqggb.png",
+  "rating": 0,
+  "specialties": [
+    "Indian"
+  ],
+  "bio": "ss",
+  "aadhaarNumber": "233234444432",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1747650020/maid_aadhaar/fpp2ndwcre9hj1gaqggb.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682b06f1361005faaeb1854a"
+  },
+  "userId": "67fe3a1c5611d39ee2a6b6d6",
+  "fullName": "maid4",
+  "email": "maid4@mailinator.com",
+  "phone": "1122334522",
+  "experience": "1-3 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1747650287/maid_aadhaar/bbktumxfy5oluhsibrgu.png",
+  "rating": 0,
+  "specialties": [
+    "Italian",
+    "Thai"
+  ],
+  "bio": "sfas",
+  "aadhaarNumber": "233234444494",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1747650287/maid_aadhaar/bbktumxfy5oluhsibrgu.png",
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "683831279e1ccc3f778e446f"
+  },
+  "userId": "682eb354bc04c8a5c68bc6a9",
+  "fullName": "cook1",
+  "email": "cook@mailinator.com",
+  "phone": "0987635233",
+  "experience": "0-1 years",
+  "image": "https://res.cloudinary.com/dn5igs95g/image/upload/v1748513062/maid_aadhaar/cdolmsvk1aui14umkzrl.png",
+  "rating": 0,
+  "specialties": [
+    "Indian"
+  ],
+  "bio": "sa",
+  "aadhaarNumber": "233234444432",
+  "aadhaarPhoto": "https://res.cloudinary.com/dn5igs95g/image/upload/v1748513062/maid_aadhaar/cdolmsvk1aui14umkzrl.png",
+  "location": {
+    "$oid": "682d866d93c94dbbb2343d78"
+  },
+  "pincode": 625002,
+  "bankDetails": {
+    "accountNumber": "1234567890123456",
+    "bankName": "indian",
+    "ifscCode": "ICIC0001359",
+    "accountHolderName": "sakthi"
+  },
+  "status": "approved",
+  "__v": 0
+}]

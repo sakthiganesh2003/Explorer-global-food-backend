@@ -23,6 +23,7 @@ router.get('/all/status',bookingController.getStats)
 router.get('/bookings/maids/:id',bookingController.getBookingsByMaidId)
 router.get('/admin/earings/',bookingController.getTotalEarnings)
 router.get('/maid/earings/',bookingController.getAllMaidEarnings )
+// router.get('/getall/:id', bookingController.getBookingByMaidId)
  console.log("Total Orders Route Hit");
 
 

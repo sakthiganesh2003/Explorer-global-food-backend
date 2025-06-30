@@ -1,0 +1,32 @@
+[{
+  "_id": {
+    "$oid": "683991077de4c503deaef24c"
+  },
+  "userId": {
+    "$oid": "67f4d1f9bfeeaf5f4d6b4cdb"
+  },
+  "bio": "Software developer with a passion for AI and machine learning.",
+  "createdAt": {
+    "$date": "2025-05-30T11:05:43.359Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-30T11:05:43.359Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68399158baae938cbd53576f"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "bio": "Software developer with a passion for AI and machine learning.",
+  "createdAt": {
+    "$date": "2025-05-30T11:07:04.589Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-30T11:07:04.590Z"
+  },
+  "__v": 0
+}]

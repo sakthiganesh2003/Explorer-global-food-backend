@@ -1,0 +1,32 @@
+[{
+  "_id": {
+    "$oid": "67da9f9fdcb8679e8547050d"
+  },
+  "name": "Italian",
+  "image": "https://example.com/italian-food.jpg",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67e3a093e7a0eb0ae78899da"
+  },
+  "name": "Italian",
+  "image": "https://example.com/italian-food.jpg",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67e549075cda092da81c270a"
+  },
+  "name": "Maria Lopez",
+  "image": ".jpg",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67eb82ded47286c93e589aed"
+  },
+  "name": "Linh Nguyen",
+  "image": "chef1.jpg",
+  "__v": 0
+}]

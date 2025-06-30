@@ -1,0 +1,2810 @@
+[{
+  "_id": {
+    "$oid": "6808c7d764a373a1e1e6d4f2"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maid": {
+    "$oid": "67f7ace2eb7e2f4ac5d84183"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "jljl",
+      "specialRequests": "uiiuo",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6808c7d764a373a1e1e6d4f3"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-04-23",
+    "time": [
+      "5:00 PM"
+    ],
+    "address": "kiioipoiop",
+    "phoneNumber": "9889898989",
+    "_id": {
+      "$oid": "6808c7d764a373a1e1e6d4f4"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6808c7d764a373a1e1e6d4f5"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-04-23T10:58:31.901Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6808cafc64a373a1e1e6d518"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maid": {
+    "$oid": "67f7ae56551d180e2e534bbd"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "klkl",
+      "specialRequests": "llk",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6808cafc64a373a1e1e6d519"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-04-29",
+    "time": [
+      "8:00 AM"
+    ],
+    "address": "ipiopi",
+    "phoneNumber": "9800980880",
+    "_id": {
+      "$oid": "6808cafc64a373a1e1e6d51a"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 3,
+      "_id": {
+        "$oid": "6808cafc64a373a1e1e6d51b"
+      }
+    }
+  ],
+  "totalAmount": 540,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-04-23T11:11:56.252Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680a09307b3db9c160ccc51b"
+  },
+  "userId": {
+    "$oid": "67f7614fd6c443f62fb8d966"
+  },
+  "maid": {
+    "$oid": "67f7ace2eb7e2f4ac5d84183"
+  },
+  "cuisine": {
+    "id": "italian",
+    "name": "Italian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "milk",
+      "specialRequests": "spicy more",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "680a09307b3db9c160ccc51c"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-04-24",
+    "time": [
+      "4:00 PM"
+    ],
+    "address": "ryweipryopi",
+    "phoneNumber": "9809809898",
+    "_id": {
+      "$oid": "680a09307b3db9c160ccc51d"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-pasta",
+      "name": "Pasta",
+      "price": 250,
+      "quantity": 1,
+      "_id": {
+        "$oid": "680a09307b3db9c160ccc51e"
+      }
+    },
+    {
+      "id": "food-pizza",
+      "name": "Pizza",
+      "price": 300,
+      "quantity": 1,
+      "_id": {
+        "$oid": "680a09307b3db9c160ccc51f"
+      }
+    }
+  ],
+  "totalAmount": 550,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-04-24T09:49:36.145Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680a295d4a3b3418dcd5296e"
+  },
+  "userId": {
+    "$oid": "67f7614fd6c443f62fb8d966"
+  },
+  "maid": {
+    "$oid": "67f7af3a551d180e2e534bc2"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegan",
+      "allergies": "kj",
+      "specialRequests": "kjkj",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "680a295d4a3b3418dcd5296f"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-04-24",
+    "time": [
+      "10:00 AM"
+    ],
+    "address": "llk",
+    "phoneNumber": "9898988908",
+    "_id": {
+      "$oid": "680a295d4a3b3418dcd52970"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "680a295d4a3b3418dcd52971"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "680a295d4a3b3418dcd52972"
+      }
+    }
+  ],
+  "totalAmount": 230,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-04-24T12:06:53.484Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680b384ea21a6ff5f3293b0a"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maid": {
+    "$oid": "680b378aa21a6ff5f3293aee"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "sfasdf",
+      "specialRequests": "sadfas",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "680b384ea21a6ff5f3293b0b"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-19",
+    "time": [
+      "10:00 AM"
+    ],
+    "address": "asdfasdf",
+    "phoneNumber": "2134568789",
+    "_id": {
+      "$oid": "680b384ea21a6ff5f3293b0c"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "680b384ea21a6ff5f3293b0d"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-04-25T07:22:54.218Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68108ab1c38729c7c8f581c3"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "sddfasdf",
+      "specialRequests": "asfasf",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "68108ab1c38729c7c8f581c4"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-04-29",
+    "time": [
+      "2:00 PM"
+    ],
+    "address": "sadfasdf",
+    "phoneNumber": "1234412312",
+    "_id": {
+      "$oid": "68108ab1c38729c7c8f581c5"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68108ab1c38729c7c8f581c6"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-04-29T08:15:45.050Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6811fa89a28418bb77a6fc66"
+  },
+  "userId": {
+    "$oid": "67f76f8d93382896b85d1298"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "ds",
+      "specialRequests": "d",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6811fa89a28418bb77a6fc67"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-04-30",
+    "time": [
+      "4:00 PM"
+    ],
+    "address": "88098",
+    "phoneNumber": "0900905454",
+    "_id": {
+      "$oid": "6811fa89a28418bb77a6fc68"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6811fa89a28418bb77a6fc69"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6811fa89a28418bb77a6fc6a"
+      }
+    }
+  ],
+  "totalAmount": 400,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-04-30T10:25:13.744Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6818513daf2c2f30f0302586"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "s",
+      "specialRequests": "s",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6818513daf2c2f30f0302587"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-05",
+    "time": [
+      "4:00 PM"
+    ],
+    "address": "ss",
+    "phoneNumber": "9898888899",
+    "_id": {
+      "$oid": "6818513daf2c2f30f0302588"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6818513daf2c2f30f0302589"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6818513daf2c2f30f030258a"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6818513daf2c2f30f030258b"
+      }
+    }
+  ],
+  "totalAmount": 450,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-05T05:48:45.948Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "681853eeaf2c2f30f0302611"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "dd",
+      "specialRequests": "dd",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "681853eeaf2c2f30f0302612"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-14",
+    "time": [
+      "2:00 PM"
+    ],
+    "address": "i0909u8",
+    "phoneNumber": "9897897897",
+    "_id": {
+      "$oid": "681853eeaf2c2f30f0302613"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "681853eeaf2c2f30f0302614"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "681853eeaf2c2f30f0302615"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "681853eeaf2c2f30f0302616"
+      }
+    }
+  ],
+  "totalAmount": 450,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-05T06:00:14.677Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "681859ce2eddfa98f04cbc54"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "italian",
+    "name": "Italian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "681859ce2eddfa98f04cbc55"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-08",
+    "time": [
+      "3:00 PM"
+    ],
+    "address": "opoppo",
+    "phoneNumber": "8908909889",
+    "_id": {
+      "$oid": "681859ce2eddfa98f04cbc56"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-pasta",
+      "name": "Pasta",
+      "price": 250,
+      "quantity": 1,
+      "_id": {
+        "$oid": "681859ce2eddfa98f04cbc57"
+      }
+    },
+    {
+      "id": "food-pizza",
+      "name": "Pizza",
+      "price": 300,
+      "quantity": 1,
+      "_id": {
+        "$oid": "681859ce2eddfa98f04cbc58"
+      }
+    }
+  ],
+  "totalAmount": 550,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-05T06:25:18.323Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6818952bf329f331e647ae9e"
+  },
+  "userId": {
+    "$oid": "681894dff329f331e647ae91"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "italian",
+    "name": "Italian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nu",
+      "specialRequests": "ss",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6818952bf329f331e647ae9f"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-13",
+    "time": [
+      "3:00 PM"
+    ],
+    "address": "iooioi",
+    "phoneNumber": "2112121265",
+    "_id": {
+      "$oid": "6818952bf329f331e647aea0"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-pasta",
+      "name": "Pasta",
+      "price": 250,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6818952bf329f331e647aea1"
+      }
+    },
+    {
+      "id": "food-risotto",
+      "name": "Risotto",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6818952bf329f331e647aea2"
+      }
+    }
+  ],
+  "totalAmount": 530,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-05T10:38:35.615Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6819a2409a123ba7c358d939"
+  },
+  "userId": {
+    "$oid": "681894dff329f331e647ae91"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "d",
+      "specialRequests": "d",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6819a2409a123ba7c358d93a"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-13",
+    "time": [
+      "5:00 PM"
+    ],
+    "address": "popoi90",
+    "phoneNumber": "1323131213",
+    "_id": {
+      "$oid": "6819a2409a123ba7c358d93b"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6819a2409a123ba7c358d93c"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6819a2409a123ba7c358d93d"
+      }
+    }
+  ],
+  "totalAmount": 400,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-06T05:46:40.013Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6819a3ff9a123ba7c358d9bf"
+  },
+  "userId": {
+    "$oid": "681894dff329f331e647ae91"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "italian",
+    "name": "Italian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "o",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6819a3ff9a123ba7c358d9c0"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-06",
+    "time": [
+      "12:00 PM"
+    ],
+    "address": "ioiioppoioip",
+    "phoneNumber": "4543433443",
+    "_id": {
+      "$oid": "6819a3ff9a123ba7c358d9c1"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-pasta",
+      "name": "Pasta",
+      "price": 250,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6819a3ff9a123ba7c358d9c2"
+      }
+    }
+  ],
+  "totalAmount": 500,
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2025-05-06T05:54:07.888Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6819a4559a123ba7c358d9d9"
+  },
+  "userId": {
+    "$oid": "681894dff329f331e647ae91"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "italian",
+    "name": "Italian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "kk",
+      "specialRequests": "oo",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6819a4559a123ba7c358d9da"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-08",
+    "time": [
+      "8:00 AM"
+    ],
+    "address": "oipioioppoi",
+    "phoneNumber": "5644455443",
+    "_id": {
+      "$oid": "6819a4559a123ba7c358d9db"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-pasta",
+      "name": "Pasta",
+      "price": 250,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6819a4559a123ba7c358d9dc"
+      }
+    }
+  ],
+  "totalAmount": 250,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-06T05:55:33.599Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6819e7deb22b20ffed34f12e"
+  },
+  "userId": {
+    "$oid": "681894dff329f331e647ae91"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "ee",
+      "specialRequests": "e",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6819e7deb22b20ffed34f12f"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-06",
+    "time": [
+      "2:00 PM"
+    ],
+    "address": "ytty",
+    "phoneNumber": "2143214231",
+    "_id": {
+      "$oid": "6819e7deb22b20ffed34f130"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6819e7deb22b20ffed34f131"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6819e7deb22b20ffed34f132"
+      }
+    }
+  ],
+  "totalAmount": 230,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-06T10:43:42.790Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6822e1902f411dd43cca437c"
+  },
+  "userId": {
+    "$oid": "6822e1212f411dd43cca436f"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "italian",
+    "name": "Italian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6822e1902f411dd43cca437d"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-28",
+    "time": [
+      "3:00 PM"
+    ],
+    "address": "phfd ghpag",
+    "phoneNumber": "0898080898",
+    "_id": {
+      "$oid": "6822e1902f411dd43cca437e"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-risotto",
+      "name": "Risotto",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6822e1902f411dd43cca437f"
+      }
+    },
+    {
+      "id": "food-pasta",
+      "name": "Pasta",
+      "price": 250,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6822e1902f411dd43cca4380"
+      }
+    },
+    {
+      "id": "food-pizza",
+      "name": "Pizza",
+      "price": 300,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6822e1902f411dd43cca4381"
+      }
+    }
+  ],
+  "totalAmount": 830,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-13T06:07:12.874Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682467c4e7706af037f2ea42"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682467c4e7706af037f2ea43"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-21",
+    "time": [
+      "12:00 PM"
+    ],
+    "address": "kjjklsjjlkjsjd",
+    "phoneNumber": "4455454464",
+    "_id": {
+      "$oid": "682467c4e7706af037f2ea44"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682467c4e7706af037f2ea45"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682467c4e7706af037f2ea46"
+      }
+    }
+  ],
+  "totalAmount": 230,
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2025-05-14T09:52:04.162Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68246f6c23882da145f79836"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "68246f6c23882da145f79837"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-21",
+    "time": [
+      "6:00 PM"
+    ],
+    "address": "noiuoiuono",
+    "phoneNumber": "9898099090",
+    "_id": {
+      "$oid": "68246f6c23882da145f79838"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68246f6c23882da145f79839"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68246f6c23882da145f7983a"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68246f6c23882da145f7983b"
+      }
+    }
+  ],
+  "totalAmount": 450,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-14T10:24:44.800Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6826e5bc5b5b7e9ef00bf3ec"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "ssss",
+      "specialRequests": "ss",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6826e5bc5b5b7e9ef00bf3ed"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-16",
+    "time": [
+      "3:00 PM"
+    ],
+    "address": "asjkdkm",
+    "phoneNumber": "9888908908",
+    "_id": {
+      "$oid": "6826e5bc5b5b7e9ef00bf3ee"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6826e5bc5b5b7e9ef00bf3ef"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-16T07:14:04.150Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68270a6430d4b588db777711"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "ss",
+      "specialRequests": "ss",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "68270a6430d4b588db777712"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-29",
+    "time": [
+      "2:00 PM"
+    ],
+    "address": "kkljlk",
+    "phoneNumber": "0808999098",
+    "_id": {
+      "$oid": "68270a6430d4b588db777713"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68270a6430d4b588db777714"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-16T09:50:28.131Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68288af89c6a006a520ed69d"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "n",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "68288af89c6a006a520ed69e"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-17",
+    "time": [
+      "8:00 AM"
+    ],
+    "address": "otie",
+    "phoneNumber": "8989099090",
+    "_id": {
+      "$oid": "68288af89c6a006a520ed69f"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68288af89c6a006a520ed6a0"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2025-05-17T13:11:20.216Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682b0bce1e9cbcc647da0679"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "n",
+      "specialRequests": "n",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682b0bce1e9cbcc647da067a"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-19",
+    "time": [
+      "9:00 AM"
+    ],
+    "address": "oanhi ipa",
+    "phoneNumber": "8980980989",
+    "_id": {
+      "$oid": "682b0bce1e9cbcc647da067b"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682b0bce1e9cbcc647da067c"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2025-05-19T10:45:34.185Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682c3333feafe29737559a77"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "n",
+      "specialRequests": "n",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682c3333feafe29737559a78"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-20",
+    "time": [
+      "10:00 AM"
+    ],
+    "address": "jjklkjlppopio",
+    "phoneNumber": "9898989898",
+    "_id": {
+      "$oid": "682c3333feafe29737559a79"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682c3333feafe29737559a7a"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682c3333feafe29737559a7b"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682c3333feafe29737559a7c"
+      }
+    }
+  ],
+  "totalAmount": 450,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-20T07:45:55.979Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682c70a9feafe29737559df1"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682c70a9feafe29737559df2"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-20",
+    "time": [
+      "8:00 PM"
+    ],
+    "address": "11/A ",
+    "phoneNumber": "8998889999",
+    "_id": {
+      "$oid": "682c70a9feafe29737559df3"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682c70a9feafe29737559df4"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682c70a9feafe29737559df5"
+      }
+    }
+  ],
+  "totalAmount": 400,
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2025-05-20T12:08:09.829Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682da294cb73d06a9cca9bbf"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682da294cb73d06a9cca9bc0"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-21",
+    "time": [
+      "12:00 PM"
+    ],
+    "address": "dnlklnkfd",
+    "phoneNumber": "9889989898",
+    "_id": {
+      "$oid": "682da294cb73d06a9cca9bc1"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682da294cb73d06a9cca9bc2"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-21T09:53:24.368Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682dac0ccb73d06a9cca9c80"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "v",
+      "specialRequests": "v",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682dac0ccb73d06a9cca9c81"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-22",
+    "time": [
+      "8:00 AM"
+    ],
+    "address": "hkghkjghhkggggggggg",
+    "phoneNumber": "8989898988",
+    "_id": {
+      "$oid": "682dac0ccb73d06a9cca9c82"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682dac0ccb73d06a9cca9c83"
+      }
+    }
+  ],
+  "totalAmount": 50,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-21T10:33:48.024Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682dade7cb73d06a9cca9c97"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67ed078fbcc229aff72631bd"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "b",
+      "specialRequests": "b",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682dade7cb73d06a9cca9c98"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-22",
+    "time": [
+      "8:00 AM"
+    ],
+    "address": "yuuyuyu",
+    "phoneNumber": "8888889999",
+    "_id": {
+      "$oid": "682dade7cb73d06a9cca9c99"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682dade7cb73d06a9cca9c9a"
+      }
+    }
+  ],
+  "totalAmount": 50,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-21T10:41:43.875Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682dafe4cb73d06a9cca9cae"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegan",
+      "allergies": "n",
+      "specialRequests": "n",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682dafe4cb73d06a9cca9caf"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-22",
+    "time": [
+      "12:00 PM"
+    ],
+    "address": "nnnnn",
+    "phoneNumber": "8787888788",
+    "_id": {
+      "$oid": "682dafe4cb73d06a9cca9cb0"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682dafe4cb73d06a9cca9cb1"
+      }
+    }
+  ],
+  "totalAmount": 50,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-21T10:50:12.167Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682db23bcb73d06a9cca9d18"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "a",
+      "specialRequests": "a",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682db23bcb73d06a9cca9d19"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-22",
+    "time": [
+      "2:00 PM"
+    ],
+    "address": "88hhi8i88",
+    "phoneNumber": "8888888889",
+    "_id": {
+      "$oid": "682db23bcb73d06a9cca9d1a"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682db23bcb73d06a9cca9d1b"
+      }
+    }
+  ],
+  "totalAmount": 50,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-05-21T11:00:11.736Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682db39acb73d06a9cca9d4a"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "n",
+      "specialRequests": "n",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682db39acb73d06a9cca9d4b"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-22",
+    "time": [
+      "8:00 PM"
+    ],
+    "address": "8888889",
+    "phoneNumber": "8989899899",
+    "_id": {
+      "$oid": "682db39acb73d06a9cca9d4c"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682db39acb73d06a9cca9d4d"
+      }
+    }
+  ],
+  "totalAmount": 50,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-21T11:06:02.000Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682db883cb73d06a9cca9e4d"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "s",
+      "specialRequests": "s",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682db883cb73d06a9cca9e4e"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-22",
+    "time": [
+      "4:00 PM"
+    ],
+    "address": "ss",
+    "phoneNumber": "8787888888",
+    "_id": {
+      "$oid": "682db883cb73d06a9cca9e4f"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682db883cb73d06a9cca9e50"
+      }
+    }
+  ],
+  "totalAmount": 50,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-21T11:26:59.624Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682ee171d6f296724157c8f4"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "n",
+      "specialRequests": "n",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682ee171d6f296724157c8f5"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-31",
+    "time": [
+      "5:00 PM"
+    ],
+    "address": "ghghjjg",
+    "phoneNumber": "0989898999",
+    "_id": {
+      "$oid": "682ee171d6f296724157c8f6"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682ee171d6f296724157c8f7"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682ee171d6f296724157c8f8"
+      }
+    }
+  ],
+  "totalAmount": 230,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-22T08:33:53.589Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682f043fd6f296724157cd0d"
+  },
+  "userId": {
+    "$oid": "682f0360d6f296724157ccf3"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "s",
+      "specialRequests": "s",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682f043fd6f296724157cd0e"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-31",
+    "time": [
+      "3:00 PM"
+    ],
+    "address": "yghm",
+    "phoneNumber": "8990980098",
+    "_id": {
+      "$oid": "682f043fd6f296724157cd0f"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682f043fd6f296724157cd10"
+      }
+    },
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682f043fd6f296724157cd11"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682f043fd6f296724157cd12"
+      }
+    }
+  ],
+  "totalAmount": 450,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-22T11:02:23.141Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682f220186482c9203fa9f22"
+  },
+  "userId": {
+    "$oid": "682f0798d066108a337b221a"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "n",
+      "specialRequests": "n",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "682f220186482c9203fa9f23"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-30",
+    "time": [
+      "2:00 PM"
+    ],
+    "address": "ygukhjhj",
+    "phoneNumber": "0990909009",
+    "_id": {
+      "$oid": "682f220186482c9203fa9f24"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "682f220186482c9203fa9f25"
+      }
+    }
+  ],
+  "totalAmount": 50,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-22T13:09:21.769Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68354f279b6643b2ed7d1821"
+  },
+  "userId": {
+    "$oid": "683549979b6643b2ed7d180e"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "68354f279b6643b2ed7d1822"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-27",
+    "time": [
+      "4:00 PM"
+    ],
+    "address": "11/A ona",
+    "phoneNumber": "8988989898",
+    "_id": {
+      "$oid": "68354f279b6643b2ed7d1823"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68354f279b6643b2ed7d1824"
+      }
+    },
+    {
+      "id": "food-biryani",
+      "name": "Biryani",
+      "price": 220,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68354f279b6643b2ed7d1825"
+      }
+    }
+  ],
+  "totalAmount": 400,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-27T05:35:35.204Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6836dec74e9a23ea63c55ecb"
+  },
+  "userId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "italian",
+    "name": "Italian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "spicy",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6836dec74e9a23ea63c55ecc"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-28",
+    "time": [
+      "8:00 PM"
+    ],
+    "address": "11/a therkuvasal",
+    "phoneNumber": "9898989889",
+    "_id": {
+      "$oid": "6836dec74e9a23ea63c55ecd"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-pasta",
+      "name": "Pasta",
+      "price": 250,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6836dec74e9a23ea63c55ece"
+      }
+    }
+  ],
+  "totalAmount": 250,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-28T10:00:39.624Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6837f9e96a9452332d8bed68"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no spicy",
+      "mealQuantity": 2,
+      "_id": {
+        "$oid": "6837f9e96a9452332d8bed69"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-29",
+    "time": [
+      "5:00 PM"
+    ],
+    "address": "11/A therkuvasal",
+    "phoneNumber": "9903232099",
+    "_id": {
+      "$oid": "6837f9e96a9452332d8bed6a"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-curry",
+      "name": "Curry",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6837f9e96a9452332d8bed6b"
+      }
+    },
+    {
+      "id": "food-naan",
+      "name": "Naan",
+      "price": 50,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6837f9e96a9452332d8bed6c"
+      }
+    }
+  ],
+  "totalAmount": 230,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-05-29T06:08:41.399Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "683837b49e1ccc3f778e4584"
+  },
+  "userId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegan",
+      "allergies": "a",
+      "specialRequests": "a",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "683837b49e1ccc3f778e4585"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-05-30",
+    "time": [
+      "12:00 PM"
+    ],
+    "address": "aa",
+    "phoneNumber": "8998989889",
+    "_id": {
+      "$oid": "683837b49e1ccc3f778e4586"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "683837b49e1ccc3f778e4587"
+      }
+    },
+    {
+      "id": "food-rogan-josh",
+      "name": "Rogan Josh",
+      "price": 320,
+      "quantity": 1,
+      "_id": {
+        "$oid": "683837b49e1ccc3f778e4588"
+      }
+    }
+  ],
+  "totalAmount": 600,
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2025-05-29T10:32:20.697Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "684284b52dbf15e439d69784"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nn",
+      "specialRequests": "nn",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "684284b52dbf15e439d69785"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-06",
+    "time": [
+      "4:00 PM"
+    ],
+    "address": "ttyyuyityt",
+    "phoneNumber": "9878798799",
+    "_id": {
+      "$oid": "684284b52dbf15e439d69786"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "684284b52dbf15e439d69787"
+      }
+    }
+  ],
+  "totalAmount": 280,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-06-06T06:03:33.097Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6847faa11c5f9dfd30215b5c"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "s",
+      "specialRequests": "s",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6847faa11c5f9dfd30215b5d"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-10",
+    "time": [
+      "8:00 PM"
+    ],
+    "address": "adss",
+    "phoneNumber": "9900990090",
+    "_id": {
+      "$oid": "6847faa11c5f9dfd30215b5e"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6847faa11c5f9dfd30215b5f"
+      }
+    }
+  ],
+  "totalAmount": 280,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-06-10T09:28:01.551Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "684804ef1c5f9dfd30215b8a"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nuts",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "684804ef1c5f9dfd30215b8b"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-11",
+    "time": [
+      "10:00 AM"
+    ],
+    "address": "jkjkllklklk",
+    "phoneNumber": "8998989898",
+    "_id": {
+      "$oid": "684804ef1c5f9dfd30215b8c"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 2,
+      "_id": {
+        "$oid": "684804ef1c5f9dfd30215b8d"
+      }
+    }
+  ],
+  "totalAmount": 560,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-06-10T10:11:59.653Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6848085d1c5f9dfd30215d4b"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "n",
+      "specialRequests": "no",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "6848085d1c5f9dfd30215d4c"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-12",
+    "time": [
+      "11:00 AM"
+    ],
+    "address": "iiooioioioioio",
+    "phoneNumber": "0909090909",
+    "_id": {
+      "$oid": "6848085d1c5f9dfd30215d4d"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6848085d1c5f9dfd30215d4e"
+      }
+    }
+  ],
+  "totalAmount": 280,
+  "status": "confirmed",
+  "createdAt": {
+    "$date": "2025-06-10T10:26:37.015Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68524d305614d0325a5e20a5"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "s",
+      "specialRequests": "s",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "68524d305614d0325a5e20a6"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-18",
+    "time": [
+      "3:00 PM"
+    ],
+    "address": "yuyt",
+    "phoneNumber": "8908909089",
+    "_id": {
+      "$oid": "68524d305614d0325a5e20a7"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68524d305614d0325a5e20a8"
+      }
+    }
+  ],
+  "totalAmount": 280,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-06-18T05:22:56.058Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68524e2d5614d0325a5e20db"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "d",
+      "specialRequests": "d",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "68524e2d5614d0325a5e20dc"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-19",
+    "time": [
+      "8:00 AM"
+    ],
+    "address": "proiprpit[",
+    "phoneNumber": "8908098909",
+    "_id": {
+      "$oid": "68524e2d5614d0325a5e20dd"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "68524e2d5614d0325a5e20de"
+      }
+    }
+  ],
+  "totalAmount": 280,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-06-18T05:27:09.167Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "685294821281f07b2c1c641d"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "nm",
+      "specialRequests": "d",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "685294821281f07b2c1c641e"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-19",
+    "time": [
+      "1:00 PM"
+    ],
+    "address": "hghhkghg",
+    "phoneNumber": "8090980909",
+    "_id": {
+      "$oid": "685294821281f07b2c1c641f"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-rogan-josh",
+      "name": "Rogan Josh",
+      "price": 320,
+      "quantity": 1,
+      "_id": {
+        "$oid": "685294821281f07b2c1c6420"
+      }
+    }
+  ],
+  "totalAmount": 320,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-06-18T10:27:14.194Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "685295aa5e964e9d6b84ee51"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "s",
+      "specialRequests": "s",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "685295aa5e964e9d6b84ee52"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-20",
+    "time": [
+      "8:00 AM"
+    ],
+    "address": "ouiyyuu",
+    "phoneNumber": "9090990009",
+    "_id": {
+      "$oid": "685295aa5e964e9d6b84ee53"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-dal-makhani",
+      "name": "Dal Makhani",
+      "price": 180,
+      "quantity": 1,
+      "_id": {
+        "$oid": "685295aa5e964e9d6b84ee54"
+      }
+    }
+  ],
+  "totalAmount": 180,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-06-18T10:32:10.633Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "685b89c0cd30b49345d45b2d"
+  },
+  "userId": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "maidId": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "cuisine": {
+    "id": "indian",
+    "name": "Indian",
+    "price": 0
+  },
+  "members": [
+    {
+      "dietaryPreference": "vegetarian",
+      "allergies": "f",
+      "specialRequests": "d",
+      "mealQuantity": 1,
+      "_id": {
+        "$oid": "685b89c0cd30b49345d45b2e"
+      }
+    }
+  ],
+  "time": {
+    "date": "2025-06-25",
+    "time": [
+      "4:00 PM"
+    ],
+    "address": "iopipopoi",
+    "phoneNumber": "9909009909",
+    "_id": {
+      "$oid": "685b89c0cd30b49345d45b2f"
+    }
+  },
+  "confirmedFoods": [
+    {
+      "id": "food-butter-chicken",
+      "name": "Butter Chicken",
+      "price": 280,
+      "quantity": 1,
+      "_id": {
+        "$oid": "685b89c0cd30b49345d45b30"
+      }
+    }
+  ],
+  "totalAmount": 280,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2025-06-25T05:31:44.876Z"
+  },
+  "__v": 0
+}]

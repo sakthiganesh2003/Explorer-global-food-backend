@@ -1,5 +1,6 @@
 const Booking = require('../../Models/booking/bookingmodel');
 const User = require('../../Models/Users');
+const Maid = require('../../Models/maid');
 const payment =require('../../Models/payment/payment')
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
@@ -60,12 +61,12 @@ const upload = multer({
 }).single('paymentProof');
 
 
-// Get all bookings
 exports.getAllBookings = async (req, res) => {
   try {
     const bookings = await Booking.find()
       .populate('userId', 'fullName email')
-      .populate('maidId', 'fullName specialties rating experience hourlyRate');
+      .populate('maidId', 'fullName specialties rating experience hourlyRate')
+      .sort({ createdAt: -1 }); // Sort by createdAt in descending order
     res.status(200).json(bookings);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching bookings', error: error.message });
@@ -75,9 +76,11 @@ exports.getAllBookings = async (req, res) => {
 exports.getBookingByMaidId = async (req, res) => {
   try {
     console.log('Maid ID:', req.params.id); // Log the maid ID for debugging
+    const sortOrder = req.query.sort === 'asc' ? 1 : -1; // Default to descending if not specified
     const bookings = await Booking.find({ maidId: req.params.id })
       .populate('userId', 'fullName email')
-      .populate('maidId', 'fullName cooking specialties ');
+      .populate('maidId', 'fullName cooking specialties')
+      .sort({ createdAt: sortOrder });
 
     if (!bookings || bookings.length === 0) {
       return res.status(404).json({ message: 'No bookings found for this maid' });
@@ -94,7 +97,8 @@ exports.getBookingByUserId = async (req, res) => {
   try {
     const bookings = await Booking.find({ userId: req.params.id })
       .populate('userId', 'fullName email')
-      .populate('maidId', 'fullName specialties rating experience hourlyRate');
+      .populate('maidId', 'fullName specialties rating experience hourlyRate')
+      .sort({ createdAt: -1 }); // Sort by createdAt in descending order
 
     if (!bookings || bookings.length === 0) {
       return res.status(404).json({ message: 'No bookings found for this user' });
@@ -105,7 +109,7 @@ exports.getBookingByUserId = async (req, res) => {
     console.error('Error fetching bookings:', error);
     res.status(500).json({ message: 'Error fetching booking', error: error.message });
   }
-}
+};
 
 
   
@@ -448,7 +452,22 @@ exports.getStats = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+exports.getBookingsByMaid = async (req, res) => {
+    try {
+      const { maidId } = req.query;
+      if (!maidId || !mongoose.isValidObjectId(maidId)) {
+        return res.status(400).json({ error: 'Valid maidId is required' });
+      }
+      const bookings = await Booking.find(
+        { maidId: new mongoose.Types.ObjectId(maidId), status: { $in: ['pending', 'confirmed'] } },
+        '_id status totalAmount'
+      ).lean();
+      res.json({ success: true, bookings });
+    } catch (error) {
+      console.error('Error fetching bookings:', error.stack);
+      res.status(500).json({ error: 'Failed to fetch bookings' });
+    }
+  };
 
 
 exports.getBookingsByMaidId = async (req, res) => {
@@ -570,17 +589,20 @@ exports.getTotalEarnings = async (req, res) => {
   }
 };
 
+
+
 exports.getAllMaidEarnings = async (req, res) => {
   try {
+    console.log('Query params:', req.query); // Log query parameters for debugging
     const pipeline = [
-      // Stage 1: Get all bookings (with optional date filtering)
+      // Stage 1: Filter bookings and ensure valid maidId
       {
         $match: {
+          maidId: { $exists: true, $ne: null },
           ...(req.query.startDate && { createdAt: { $gte: new Date(req.query.startDate) } }),
           ...(req.query.endDate && { createdAt: { $lte: new Date(req.query.endDate) } })
         }
       },
-      
       // Stage 2: Group by maidId to calculate earnings
       {
         $group: {
@@ -594,52 +616,60 @@ exports.getAllMaidEarnings = async (req, res) => {
           totalBookings: { $sum: 1 }
         }
       },
-      
-      // Stage 3: Right outer join with maids collection to include all maids
+      // Stage 3: Lookup user details from users collection
       {
         $lookup: {
-          from: "maids", // Make sure this matches your maid collection name
+          from: "users", // Join with users collection since maidId references User
           localField: "_id",
           foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+      // Stage 4: Lookup maid details from maids collection using userId
+      {
+        $lookup: {
+          from: "maids",
+          localField: "_id",
+          foreignField: "userId", // Match maidId (from Booking) to userId in maids
           as: "maidDetails"
         }
       },
       { $unwind: { path: "$maidDetails", preserveNullAndEmptyArrays: true } },
-      
-      // Stage 4: Project the final output
+      // Stage 5: Project the final output
       {
         $project: {
           maidId: "$_id",
           maidName: {
-            $ifNull: [
-              { $concat: ["$maidDetails.firstName", " ", "$maidDetails.lastName"] },
-              "Unknown Maid"
-            ]
+            $ifNull: ["$maidDetails.fullName", "$userDetails.name", "Unknown Maid"] // Fallback to user name if maid not found
           },
-          profileImage: "$maidDetails.profileImage",
+          profileImage: "$maidDetails.image",
           totalEarnings: { $ifNull: [{ $round: ["$totalEarnings", 2] }, 0] },
           completedBookings: { $ifNull: ["$completedBookings", 0] },
           totalBookings: { $ifNull: ["$totalBookings", 0] },
           _id: 0
         }
       },
-      
-      // Stage 5: Sort by highest earnings first
+      // Stage 6: Sort by highest earnings first
       { $sort: { totalEarnings: -1 } }
     ];
 
-    const result = await Booking.aggregate(pipeline);
+    let result = await Booking.aggregate(pipeline);
+    console.log('Aggregation result:', result); // Log raw aggregation output
 
-    // Alternative approach if still empty - get all maids with earnings
-    if (result.length === 0) {
-      const allMaids = await Maid.find({}, 'firstName lastName profileImage');
+    // Fallback: Include all maids if no bookings or no matches
+    if (result.length === 0 || result.every(item => item.maidName === "Unknown Maid")) {
+      console.warn('No bookings or no matching maids found, using fallback');
+      const allMaids = await Maid.find({}, 'fullName image _id userId');
+      const maidMap = new Map(allMaids.map(maid => [maid.userId.toString(), maid]));
+      
       result = allMaids.map(maid => ({
-        maidId: maid._id,
-        maidName: `${maid.firstName} ${maid.lastName}`,
-        profileImage: maid.profileImage,
-        totalEarnings: 0,
-        completedBookings: 0,
-        totalBookings: 0
+        maidId: maid.userId, // Use userId as maidId to match Booking
+        maidName: maid.fullName || 'Unknown Maid',
+        profileImage: maid.image,
+        totalEarnings: result.find(r => r.maidId?.toString() === maid.userId.toString())?.totalEarnings || 0,
+        completedBookings: result.find(r => r.maidId?.toString() === maid.userId.toString())?.completedBookings || 0,
+        totalBookings: result.find(r => r.maidId?.toString() === maid.userId.toString())?.totalBookings || 0
       }));
     }
 
@@ -648,13 +678,12 @@ exports.getAllMaidEarnings = async (req, res) => {
       count: result.length,
       earnings: result
     });
-
   } catch (error) {
-    console.error('Error fetching maid earnings:', error);
+    console.error('Error fetching maid earnings:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Error fetching maid earnings',
       error: error.message
     });
   }
-}
+};

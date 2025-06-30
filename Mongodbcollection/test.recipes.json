@@ -1,0 +1,263 @@
+[{
+  "_id": {
+    "$oid": "681c82d12f5277a8ded4c972"
+  },
+  "recipe_name": "dsd",
+  "category_type": "Breakfast",
+  "instructions": "zzxcv",
+  "cuisine_type": "Mexican",
+  "ingredients": [
+    "3qerzs"
+  ],
+  "prep_time": "2",
+  "cook_time": "1",
+  "servings": "3",
+  "media": {
+    "url": "https://res.cloudinary.com/dn5igs95g/image/upload/v1746698959/recipe_uploads/oqpaulfiwwzzkdf4tyl1.png",
+    "public_id": "recipe_uploads/oqpaulfiwwzzkdf4tyl1",
+    "media_type": "image",
+    "width": 1895,
+    "height": 997,
+    "format": "png"
+  },
+  "date_time": {
+    "$date": "2025-05-08T10:09:21.787Z"
+  },
+  "created_at": {
+    "$date": "2025-05-08T10:09:21.787Z"
+  },
+  "createdAt": {
+    "$date": "2025-05-08T10:09:21.797Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-08T10:09:21.797Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "681c909a2f5277a8ded4c98e"
+  },
+  "recipe_name": "Chicken Biryani",
+  "category_type": "Other",
+  "instructions": "1. Marinate chicken.\\n2. Cook rice.\\n3. Layer and cook together.",
+  "cuisine_type": "International",
+  "ingredients": [
+    "Chicken",
+    "Rice",
+    "Yogurt",
+    "Spices",
+    "Onions"
+  ],
+  "prep_time": "30",
+  "cook_time": "60",
+  "servings": "4",
+  "media": {
+    "url": "https://res.cloudinary.com/dn5igs95g/video/upload/v1746702484/recipe_uploads/bjffcwtckv4mmfcmz1r1.mp4",
+    "public_id": "recipe_uploads/bjffcwtckv4mmfcmz1r1",
+    "media_type": "video",
+    "width": 1920,
+    "height": 1080,
+    "format": "mp4",
+    "duration": 5.56
+  },
+  "date_time": {
+    "$date": "2025-05-08T11:08:10.373Z"
+  },
+  "created_at": {
+    "$date": "2025-05-08T11:08:10.374Z"
+  },
+  "createdAt": {
+    "$date": "2025-05-08T11:08:10.378Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-08T11:08:10.378Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "681c974a2f5277a8ded4c99a"
+  },
+  "recipe_name": "gal",
+  "category_type": "Appetizer",
+  "instructions": "asd jf fasdfasd",
+  "cuisine_type": "Chinese",
+  "ingredients": [
+    "a;lskdj oa jdsoi"
+  ],
+  "prep_time": "22",
+  "cook_time": "22",
+  "servings": "22",
+  "media": {
+    "url": "https://res.cloudinary.com/dn5igs95g/image/upload/v1746704200/recipe_uploads/zq0witj70x641bd5tcj5.png",
+    "public_id": "recipe_uploads/zq0witj70x641bd5tcj5",
+    "media_type": "image",
+    "width": 1666,
+    "height": 981,
+    "format": "png"
+  },
+  "date_time": {
+    "$date": "2025-05-08T11:36:42.250Z"
+  },
+  "created_at": {
+    "$date": "2025-05-08T11:36:42.250Z"
+  },
+  "createdAt": {
+    "$date": "2025-05-08T11:36:42.251Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-08T11:36:42.251Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6824491816201e34c1582859"
+  },
+  "recipe_name": "Chicken Biryani",
+  "category_type": "Other",
+  "instructions": "1. Marinate chicken.\\n2. Cook rice.\\n3. Layer and cook together.",
+  "cuisine_type": "International",
+  "ingredients": [
+    "Chicken",
+    "Rice",
+    "Yogurt",
+    "Spices",
+    "Onions"
+  ],
+  "prep_time": "30",
+  "cook_time": "60",
+  "servings": "4",
+  "media": {
+    "url": "https://res.cloudinary.com/dn5igs95g/video/upload/v1747208464/recipe_uploads/woyebsbbxpdcr0twaeoz.mp4",
+    "public_id": "recipe_uploads/woyebsbbxpdcr0twaeoz",
+    "media_type": "video",
+    "width": 1920,
+    "height": 1080,
+    "format": "mp4",
+    "duration": 5.56
+  },
+  "date_time": {
+    "$date": "2025-05-14T07:41:12.099Z"
+  },
+  "created_at": {
+    "$date": "2025-05-14T07:41:12.099Z"
+  },
+  "createdAt": {
+    "$date": "2025-05-14T07:41:12.108Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-14T07:41:12.108Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682450d616201e34c1582892"
+  },
+  "recipe_name": "ff",
+  "category_type": "Lunch",
+  "instructions": "a dioajodoiaopw",
+  "cuisine_type": "American",
+  "ingredients": [
+    "sdfsdf"
+  ],
+  "prep_time": "22",
+  "cook_time": "22",
+  "servings": "2",
+  "media": {
+    "url": "https://res.cloudinary.com/dn5igs95g/video/upload/v1747210443/recipe_uploads/yjv8ykv5sscfoeahfb4o.mp4",
+    "public_id": "recipe_uploads/yjv8ykv5sscfoeahfb4o",
+    "media_type": "video",
+    "width": 2560,
+    "height": 1440,
+    "format": "mp4",
+    "duration": 5.56
+  },
+  "date_time": {
+    "$date": "2025-05-14T08:14:14.369Z"
+  },
+  "created_at": {
+    "$date": "2025-05-14T08:14:14.369Z"
+  },
+  "createdAt": {
+    "$date": "2025-05-14T08:14:14.372Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-14T08:14:14.372Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682b1d80f80b11b0cc6390a0"
+  },
+  "recipe_name": "dd",
+  "category_type": "Breakfast",
+  "instructions": "zdvfvs",
+  "cuisine_type": "Mexican",
+  "ingredients": [
+    "fhmfvyj"
+  ],
+  "prep_time": "1",
+  "cook_time": "1",
+  "servings": "4",
+  "media": {
+    "url": "https://res.cloudinary.com/dn5igs95g/image/upload/v1747656059/recipe_uploads/svwgswwbz3skyt2tau6e.jpg",
+    "public_id": "recipe_uploads/svwgswwbz3skyt2tau6e",
+    "media_type": "image",
+    "width": 7360,
+    "height": 4912,
+    "format": "jpg"
+  },
+  "date_time": {
+    "$date": "2025-05-19T12:01:04.143Z"
+  },
+  "created_at": {
+    "$date": "2025-05-19T12:01:04.143Z"
+  },
+  "createdAt": {
+    "$date": "2025-05-19T12:01:04.146Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-19T12:01:04.146Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6838059f6a9452332d8bf133"
+  },
+  "recipe_name": "Briyani",
+  "category_type": "Lunch",
+  "instructions": "Step 1 Prepare saffron-kewra water and chop veggies\r\nTo make a delightful chicken biryani dish, firstly soak saffron in water to prepare saffron water (one tsp saffron can be soaked in 1/4 cup water). Next, mix kewra drops in water and mix well to make kewra water. Set them aside for later usage. Now, chop the onion and coriander leaves and keep them aside.\r\n\r\nStep 2 Saute the onions\r\nMeanwhile, heat olive oil in a deep bottomed pan. Once the oil is hot enough, add cumin seeds, bay leaf, green cardamom, black cardamom, cloves in it, and saute for about a minute. Then, add chopped onion to it and saute until pink. Now, add chicken into it with slit green chillies, turmeric, salt to taste, ginger-garlic paste, red chilli powder and green chilli paste. Mix well all the spices and cook for 2-3 minutes. Then, add hung curd into it and give a mix. (Make sure the chicken is washed properly and patted dry before adding it to the dish)\r\n\r\nStep 3 Cook biryani on low heat for 5-6 minutes\r\nTurn the flame to medium again and add garam masala in it along with ginger julienned, coriander and mint leaves. Add kewra water, rose water and 1 tsp saffron water in it. Cook till the chicken is tender. Then add 1 cup cooked rice and spread evenly. Then add the remaining saffron water and pour ghee over it. You can now cook the dish without the lid or cover it with a lid to give a dum-effect due to the steam formation.",
+  "cuisine_type": "Indian",
+  "ingredients": [
+    "4 tablespoons vegetable oil, divided  4 small potatoes, peeled and halved  2 large onions, finely chopped  2 cloves garlic, minced  1 tablespoon minced fresh ginger root  2 medium tomatoes, peeled and chopped  1 teaspoon salt  1 teaspoon ground cumin  ½ teaspoon chili powder  ½ teaspoon ground black pepper  ½ teaspoon ground turmeric  2 tablespoons plain yogurt  2 tablespoons chopped fresh mint leaves  ½ teaspoon ground cardamom  1 (2 inch) piece cinnamon stick  3 pounds boneless, skinless chicken pieces cut into chunks  Rice:  1 pound basmati rice  2 ½ tablespoons vegetable oil  1 large onion, diced  5 pods cardamom  3 whole cloves  1 (1 inch) piece cinnamon stick  ½ teaspoon ground ginger  1 pinch powdered saffron  4 cups chicken stock  1 ½ teaspoons salt"
+  ],
+  "prep_time": "40",
+  "cook_time": "20",
+  "servings": "2",
+  "media": {
+    "url": "https://res.cloudinary.com/dn5igs95g/image/upload/v1748501917/recipe_uploads/pxhk16hytql6ctg85f3q.jpg",
+    "public_id": "recipe_uploads/pxhk16hytql6ctg85f3q",
+    "media_type": "image",
+    "width": 4608,
+    "height": 3456,
+    "format": "jpg"
+  },
+  "date_time": {
+    "$date": "2025-05-29T06:58:39.030Z"
+  },
+  "created_at": {
+    "$date": "2025-05-29T06:58:39.031Z"
+  },
+  "createdAt": {
+    "$date": "2025-05-29T06:58:39.033Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T06:58:39.033Z"
+  },
+  "__v": 0
+}]

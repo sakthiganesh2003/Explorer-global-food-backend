@@ -1,0 +1,17 @@
+[{
+  "_id": {
+    "$oid": "67e5245471447d54733bea5b"
+  },
+  "category_id": {
+    "$oid": "65f13d5e89b25c001cbf6a92"
+  },
+  "cuisine_type": "American",
+  "order": "1",
+  "created_at": {
+    "$date": "2025-03-27T10:11:32.297Z"
+  },
+  "updated_at": {
+    "$date": "2025-03-27T10:11:32.298Z"
+  },
+  "__v": 0
+}]

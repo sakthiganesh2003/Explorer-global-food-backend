@@ -1,22 +1,14 @@
 const mongoose = require('mongoose');
 
-const userSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+const UserProfileSchema = mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   image: {
     type: String,
     default: 'https://randomuser.me/api/portraits/men/1.jpg',
   },
   phone: {
     type: String,
-    default: '',
+   
   },
   address: {
     city: {
@@ -49,4 +41,4 @@ const userSchema = mongoose.Schema({
   timestamps: true,
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('UserProfileSchema', UserProfileSchema);

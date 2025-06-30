@@ -34,7 +34,7 @@ const chefpostRoutes = require('./Routes/chef/postroutes');
 
 // const modeofpaymentRoutes = require('./Routes/payments/');
 //user
-const userRoutes = require('./Routes/user/userprofileroutes');
+
 const predefineRoutes = require('./Routes/user/predefine'); 
 
 const refundsRoutes = require('./Routes/booking/refundroutes');
@@ -42,6 +42,7 @@ const locationRoutes = require('./Routes/locationRoute')
 //feedback
 const feedbackRoutes = require('./Routes/user/feedback');
 const profile= require('./Routes/user/profile');
+const contact = require('./Routes/user/contact')
 
 // // Increase payload size limit 50MB 
 // app.use(bodyParser.json({ limit: '50mb' }));
@@ -87,7 +88,7 @@ app.use('/api/chefposts', chefpostRoutes);
 
 
 //user routes
-app.use('/api/user', userRoutes);
+
 app.use('/api/predefine', predefineRoutes);
 
 
@@ -99,6 +100,7 @@ app.use('/api/refunds', refundsRoutes);
 
 app.use('/api/feedback/',feedbackRoutes)
 app.use('/api/profile', profile);
+app.use('/api/contact/', contact);
   // Make sure this matches the controller
 
 // MongoDB Connection

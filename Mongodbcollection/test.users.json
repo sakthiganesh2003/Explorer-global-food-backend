@@ -1,0 +1,266 @@
+[{
+  "_id": {
+    "$oid": "67e392bfe7a0eb0ae78899d2"
+  },
+  "name": "babu",
+  "email": "babu@mailinator.com",
+  "password": "$2b$10$UmqEbKg6UEziD.Qmb7gUcOnJ85MZvwkyZtVf6upLiNWyWqeJAE5JK",
+  "role": "admin",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67ea2d626028bbae9d3c87b3"
+  },
+  "name": "babumaid",
+  "email": "raj@mailinator.com",
+  "password": "$2b$10$dHAC5coWheI6EEvVKJAcaewLgOnrb84dGM0jR8kozc0dXD/VB9eqS",
+  "role": "maid",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67ecfad2bcc229aff72631b9"
+  },
+  "name": "kathir",
+  "email": "sa@gmail.com",
+  "password": "$2b$10$llHbg5g5jliNnDAeEEhDEuv/YLgT2oiU4ztG4GFmuHw0AUkrLAaAi",
+  "role": "user",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67ed078fbcc229aff72631bd"
+  },
+  "name": "kathirbaimaid",
+  "email": "sakthiganesh451@gmail.com",
+  "password": "$2b$10$D33WD7zlV9kxfMSesLztee6vg29aes8x1//eYzKsPGcYpaC5NmFHi",
+  "role": "maid",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67ee76090602412a0fe1b485"
+  },
+  "name": "Fooduser",
+  "email": "fooduser@mailinator.com",
+  "password": "$2b$10$hse3xsno1XiVkQ3ubO2bEusuxBWSn12g19U8PQWjd8ZCSKWM31VP2",
+  "role": "user",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f4d1f9bfeeaf5f4d6b4cdb"
+  },
+  "name": "user",
+  "email": "userfood@mailinator.com",
+  "password": "$2b$10$7MhYoA0mMuzhjbcCCIczzOypgjVUrtuTU5YDOcuWHNfBi0vq8YZVu",
+  "role": "user",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f64b04a36d593ba17ed4a8"
+  },
+  "name": "balauser",
+  "email": "kasi@mailinator.com",
+  "password": "$2b$10$X0FZn/iRWODa0coj7p9Ha.NAhzDTFFIK8cj/JbSXyV0fS2Rqqh47a",
+  "role": "user",
+  "verificationToken": null,
+  "verificationTokenExpires": {
+    "$date": "2025-04-10T10:25:08.815Z"
+  },
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f7614fd6c443f62fb8d966"
+  },
+  "name": "maid",
+  "email": "kathirkala@mailinator.com",
+  "password": "$2b$10$mZWBg9GMZ0OfhEkxlkfR8.PfxI9LwfXlQFAwf1emLDoXc15gKuEt6",
+  "role": "maid",
+  "verificationToken": null,
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f76d902555afeb206dfdbf"
+  },
+  "name": "admin",
+  "email": "admin@mailinator.com",
+  "password": "$2b$10$DFXRpzQ2ZyRKfo2OGy/DD.qFahSJMz5ciK838K/9ni0kQKe3ggo9m",
+  "role": "user",
+  "verificationToken": "f0b9f62a5301c1a2696be407c3999c1a0696784941b0750fee3f04109a5ee01d",
+  "verificationTokenExpires": {
+    "$date": "2025-04-11T07:04:48.138Z"
+  },
+  "isVerified": false,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f76f8d93382896b85d1298"
+  },
+  "name": "thebala",
+  "email": "thebala@mailinator.com",
+  "password": "$2b$10$KmwIUdZsG.S0BITnQSA8C.6806dGQF5qLhc3kWrFtLDWNOtCpk5b.",
+  "role": "admin",
+  "verificationToken": null,
+  "verificationTokenExpires": {
+    "$date": "2025-04-11T07:13:17.143Z"
+  },
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67fe3a1c5611d39ee2a6b6d6"
+  },
+  "name": "maid1",
+  "email": "kala1@mailinator.com",
+  "password": "$2b$10$bRs8799GRKqlH2IFL5mkBeGictp2XrGQDfW1XCs1BjPOQ3mOc7J/u",
+  "role": "maid",
+  "verificationToken": null,
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680f1a686cdf4b5fc917f78c"
+  },
+  "name": "chef",
+  "email": "chef@mailinator.com",
+  "password": "$2b$10$692TelRMBvaLE.GE6DfCyO/ovG/juJeehLTDuE8bsemwYpHNzuHha",
+  "role": "chef",
+  "verificationToken": "a2e7f2976d0da7aec86cb25053d79a4827d21ed24f0d0bd176bf476cd1144a3c",
+  "isVerified": false,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680f27a8c884c593a41973dc"
+  },
+  "name": "chef1",
+  "email": "chef1@mailinator.com",
+  "password": "$2b$10$uI1jg0H/u/30ya7olVF0NuEpoaNuoPZF1gl.XUjr1k0phOiQHvGm.",
+  "role": "chef",
+  "verificationToken": null,
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "680f4cdda8f1cb48e2e73208"
+  },
+  "name": "selva",
+  "email": "selva@mailinator.com",
+  "password": "$2b$10$3QmHyttaIKqCALNMwWwZi.FxhbRP9m.JFhjkZXbezb8T57nM/JjHK",
+  "role": "chef",
+  "verificationToken": null,
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "681894dff329f331e647ae91"
+  },
+  "name": "ad",
+  "email": "ad@mailinator.com",
+  "password": "$2b$10$JLH.MUROG4oWRxPnxHg/tOLwF6HpSbPTayLHmIYFDgf3DgPXv49Tq",
+  "role": "user",
+  "verificationToken": null,
+  "verificationTokenExpires": {
+    "$date": "2025-05-06T10:37:19.623Z"
+  },
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6822e0d72f411dd43cca4369"
+  },
+  "name": "johnsnow",
+  "email": "johnsnow@mailinator.com",
+  "password": "$2b$10$u/6m5p1gSdm7fmtsc2D6cuC8Hpvo.3dma1nHYP7cG9GCFw3Rnz5XW",
+  "role": "user",
+  "verificationToken": "a65d535f604a4e8686cf9c054c2c3cdeaf2bc66c07d1d44d4f811ebf44fb6e30",
+  "verificationTokenExpires": {
+    "$date": "2025-05-14T06:04:07.093Z"
+  },
+  "isVerified": false,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6822e1212f411dd43cca436f"
+  },
+  "name": "johnsnows",
+  "email": "johnshow@mailinator.com",
+  "password": "$2b$10$9mTwR/a7lmwzFAs9rFW83u8ibcD4l06WTdnsudLQw7agTuDzEQypq",
+  "role": "user",
+  "verificationToken": null,
+  "verificationTokenExpires": {
+    "$date": "2025-05-14T06:05:21.953Z"
+  },
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "682eb354bc04c8a5c68bc6a9"
+  },
+  "name": "cook1",
+  "email": "cook1@mailinator.com",
+  "password": "$2b$10$bPTNOCpv7sn4YrBiimUCY.L50Umf2Ag8fTMqZjXdavK6Qbcs0Wkxe",
+  "role": "maid",
+  "verificationToken": null,
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "683549979b6643b2ed7d180e"
+  },
+  "name": "abc",
+  "email": "deva@mailinator.com",
+  "password": "$2b$10$1oSIlqXY0EaQZ3Mj0xyFrOqPquO6TH5nwAqxfOTsfZNSN8Cq.IKpa",
+  "role": "user",
+  "verificationToken": null,
+  "verificationTokenExpires": {
+    "$date": "2025-05-28T05:11:51.565Z"
+  },
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6842986a2dbf15e439d6982b"
+  },
+  "name": "vikram",
+  "email": "vikaram@mailinator.com",
+  "password": "$2b$10$ymvXukSMbuW7zUl5fo7IQOdgo9Ws.Fy7mjhSVRINrOtvZOnGX46fa",
+  "role": "user",
+  "verificationToken": null,
+  "verificationTokenExpires": {
+    "$date": "2025-06-07T07:27:38.514Z"
+  },
+  "isVerified": true,
+  "credits": 10,
+  "__v": 0
+}]
