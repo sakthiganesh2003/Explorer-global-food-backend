@@ -8,7 +8,7 @@ const {
 const { create } = require("../../Models/Users");
 
 const router = express.Router();
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.route("/").get(fetchAllRefunds).post(createRefundRequest)
 router.patch("/proof/:id", upload.single("proof"), updateRefundProof);

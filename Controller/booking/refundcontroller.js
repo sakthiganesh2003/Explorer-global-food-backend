@@ -27,35 +27,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const uploadImageToCloudinary = async (imagePath, retries = 5, initialDelay = 2000) => {
-  try {
-    await fs.promises.access(imagePath, fs.constants.R_OK);
-    console.log("File is accessible:", imagePath);
-  } catch (error) {
-    throw new Error(`File is not accessible: ${error.message}`);
-  }
-
-  try {
-    const result = await cloudinary.uploader.upload(imagePath, {
-      folder: "refunds",
-      timeout: 60000,
-    });
-    console.log("Cloudinary upload success:", result.secure_url);
-    return result.secure_url;
-  } catch (error) {
-    console.error("Cloudinary upload error:", {
-      message: error.message,
-      stack: error.stack,
-      retryCount: retries,
-    });
-    if (retries > 0) {
-      const delay = initialDelay * (6 - retries);
-      console.log(`Retrying Cloudinary upload... Attempts left: ${retries}, Delay: ${delay}ms`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      return uploadImageToCloudinary(imagePath, retries - 1, initialDelay);
-    }
-    throw new Error(`Cloudinary upload failed after ${retries + 1} attempts: ${error.message}`);
-  }
+const uploadImageToCloudinary = (file) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "refunds" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    );
+    uploadStream.end(file.buffer);
+  });
 };
 
 exports.fetchAllRefunds = async (req, res) => {
@@ -88,32 +70,19 @@ exports.updateRefundProof = async (req, res) => {
 
     const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
     if (!allowedTypes.includes(req.file.mimetype)) {
-      fs.unlinkSync(req.file.path);
       return res.status(400).json({ success: false, error: "Only JPEG, PNG, or GIF images allowed" });
-    }
-
-    try {
-      await fs.promises.access(req.file.path, fs.constants.R_OK);
-    } catch (error) {
-      fs.unlinkSync(req.file.path);
-      return res.status(400).json({ success: false, error: "Invalid or corrupted file" });
     }
 
     let cloudinaryUrl;
     try {
-      cloudinaryUrl = await uploadImageToCloudinary(req.file.path);
+      cloudinaryUrl = await uploadImageToCloudinary(req.file);
     } catch (error) {
-      fs.unlinkSync(req.file.path);
       return res.status(500).json({
         success: false,
         error: "Failed to upload proof image to Cloudinary",
         details: error.message,
       });
     }
-
-    fs.unlink(req.file.path, (err) => {
-      if (err) console.error("Error deleting local file:", err);
-    });
 
     const refund = await Refunds.findById(id);
     if (!refund) {
@@ -164,9 +133,6 @@ exports.updateRefundProof = async (req, res) => {
     });
   } catch (error) {
     console.error("Error submitting refund proof:", error);
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
     return res.status(500).json({
       success: false,
       error: "Server error",
