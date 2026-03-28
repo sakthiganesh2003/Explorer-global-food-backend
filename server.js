@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -59,7 +58,10 @@ app.use(
   })
 );
 
-
+// Root Route
+app.get("/", (req, res) => {
+  res.send("✅ Global Food Backend is running...");
+});
 
 // API Routes
 app.use("/api/auth", authRoutes);
@@ -104,13 +106,21 @@ app.use('/api/contact/', contact);
   // Make sure this matches the controller
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => {
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState >= 1) return;
+    
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ Connected to MongoDB");
+  } catch (err) {
     console.error("❌ MongoDB connection error:", err);
-    process.exit(1);
-  });
+    // In serverless, we don't necessarily want to process.exit(1) here 
+    // because it might be a temporary connection issue.
+  }
+};
+
+// Connect to DB immediately
+connectDB();
 
 // Start Server
 if (process.env.NODE_ENV !== 'production') {

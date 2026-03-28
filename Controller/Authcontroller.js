@@ -28,13 +28,7 @@ const transporter = nodemailer.createTransport({
 
 // Configure multer for file uploads
 const upload = multer({
-    storage: multer.diskStorage({
-        destination: './tmp/uploads/',
-        filename: (req, file, cb) => {
-            const ext = path.extname(file.originalname);
-            cb(null, uuidv4() + ext);
-        }
-    }),
+    storage: multer.memoryStorage(),
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png|pdf/;
         const extname = filetypes.test(path.extname(file.originalname).toLowerCase());

@@ -11,7 +11,7 @@ try {
 
   // Configure Multer for temporary disk storage
   const upload = multer({
-    storage: multer.diskStorage({}), // Temporary storage
+    storage: multer.memoryStorage(), // Use memory storage for Vercel
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
     fileFilter: (req, file, cb) => {
       // Allow JPG, JPEG, PNG, and PDF files

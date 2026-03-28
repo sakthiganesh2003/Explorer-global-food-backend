@@ -66,7 +66,6 @@ const guideSchema = new mongoose.Schema({
 });
 
 // Indexes for better query performance
-guideSchema.index({ userId: 1 });
 guideSchema.index({ verificationStatus: 1 });
 guideSchema.index({ serviceLocations: 1 });
 guideSchema.index({ activities: 1 });
