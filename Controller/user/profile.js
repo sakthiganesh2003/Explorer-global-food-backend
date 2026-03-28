@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const mongoose = require('mongoose');
-const cloudinary = require('../../config/cloudinary').cloudinary;
+const cloudinary = require('../../Config/cloudinary').cloudinary;
 const UserProfile = require('../../Models/userprofile');
 const User = require('../../Models/Users')
 // @desc    Create user profile

@@ -1,6 +1,6 @@
 // Controller/chef/postcontroller.js
 const Recipe = require('../../Models/chef/post');
-const cloudinary = require('../../Config/cloudinarys'); // Import configured Cloudinary
+const { cloudinary } = require('../../Config/cloudinarys'); // Import configured Cloudinary
 const multer = require('multer');
 const path = require('path');
 const mongoose = require('mongoose');
