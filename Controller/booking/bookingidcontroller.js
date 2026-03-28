@@ -294,49 +294,53 @@ exports.handleRejection = function(upload) {
                 });
               }
 
-              // Upload new file
-              cloudinary.uploader.upload(req.file.path, {
-                folder: 'payment_proofs',
-                resource_type: 'image'
-              }, function(error, result) {
-                if (error) {
-                  console.error('Cloudinary upload error:', error);
-                  return res.status(400).json({
-                    message: 'Failed to upload proof image to Cloudinary',
-                    error: error.message
-                  });
-                }
-                paymentProof = result.secure_url;
-
-                // Update reservation
-                reservation.status = 'cancelled';
-                reservation.paymentStatus = paymentStatus;
-                reservation.refundedAmount = parseFloat(refundAmount) || 0;
-                reservation.refundedReason = refundReason || '';
-                if (paymentProof) {
-                  reservation.paymentProof = paymentProof;
-                }
-
-                // Save reservation
-                reservation.save(function(err) {
-                  if (err) {
-                    console.error('Error saving reservation:', err);
-                    return res.status(500).json({ message: 'Error saving reservation', error: err.message });
+              // Upload new file using buffer stream
+              const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                  folder: 'payment_proofs',
+                  resource_type: 'image'
+                },
+                function(error, result) {
+                  if (error) {
+                    console.error('Cloudinary upload error:', error);
+                    return res.status(400).json({
+                      message: 'Failed to upload proof image to Cloudinary',
+                      error: error.message
+                    });
+                  }
+                  paymentProof = result.secure_url;
+                  
+                  // Update reservation
+                  reservation.status = 'cancelled';
+                  reservation.paymentStatus = paymentStatus;
+                  reservation.refundedAmount = parseFloat(refundAmount) || 0;
+                  reservation.refundedReason = refundReason || '';
+                  if (paymentProof) {
+                    reservation.paymentProof = paymentProof;
                   }
 
-                  // Send email notification
-                  var userEmail = reservation.userId.email;
-                  var subject = 'Reservation Cancellation and Refund';
-                  var text = 'Dear User,\n\nYour reservation (ID: ' + reservation._id + ') has been cancelled.\n\nDetails:\n- Date: ' + reservation.time.date + '\n- Time: ' + reservation.time.time.join(', ') + '\n- Address: ' + reservation.time.address + '\n- Total Amount: ' + reservation.totalAmount + '\n- Refund Amount: ' + reservation.refundedAmount + '\n- Refund Reason: ' + (reservation.refundedReason || 'Not specified') + '\n- Payment Status: ' + reservation.paymentStatus + '\n\nPlease contact support for any questions.\n\nBest regards,\nReservation Service Team';
-
-                  sendEmail(userEmail, subject, text, function(err) {
+                  // Save reservation
+                  reservation.save(function(err) {
                     if (err) {
-                      console.error('Error sending email:', err);
+                      console.error('Error saving reservation:', err);
+                      return res.status(500).json({ message: 'Error saving reservation', error: err.message });
                     }
-                    res.status(200).json({ message: 'Reservation cancelled successfully', reservation: reservation });
+
+                    // Send email notification
+                    var userEmail = reservation.userId.email;
+                    var subject = 'Reservation Cancellation and Refund';
+                    var text = 'Dear User,\n\nYour reservation (ID: ' + reservation._id + ') has been cancelled.\n\nDetails:\n- Date: ' + reservation.time.date + '\n- Time: ' + reservation.time.time.join(', ') + '\n- Address: ' + reservation.time.address + '\n- Total Amount: ' + reservation.totalAmount + '\n- Refund Amount: ' + reservation.refundedAmount + '\n- Refund Reason: ' + (reservation.refundedReason || 'Not specified') + '\n- Payment Status: ' + reservation.paymentStatus + '\n\nPlease contact support for any questions.\n\nBest regards,\nReservation Service Team';
+
+                    sendEmail(userEmail, subject, text, function(err) {
+                      if (err) {
+                        console.error('Error sending email:', err);
+                      }
+                      res.status(200).json({ message: 'Reservation cancelled successfully', reservation: reservation });
+                    });
                   });
-                });
-              });
+                }
+              );
+              uploadStream.end(req.file.buffer);
             } catch (cloudinaryError) {
               console.error('Cloudinary upload error:', cloudinaryError);
               return res.status(400).json({
