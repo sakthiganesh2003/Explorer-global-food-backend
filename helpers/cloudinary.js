@@ -1,5 +1,5 @@
 const cloudinary = require("cloudinary").v2;
-dotenv = require("dotenv");
+const dotenv = require("dotenv");
 dotenv.config();
 //configure with env data
 cloudinary.config({

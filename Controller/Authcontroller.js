@@ -11,7 +11,7 @@ const multer = require("multer");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const Guide = require("../Models/instructor");
-const cloudinary = require("../helpers/cloudinary");
+const cloudinary = require("cloudinary").v2;
 
 dotenv.config();
 
